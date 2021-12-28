@@ -1,4 +1,4 @@
-package mk.ukim.finki.masterapplicationsystem.Configurations;
+package mk.ukim.finki.masterapplicationsystem.configurations;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "filesystem")
 public class FileSystemConfiguration {
-    private boolean removeData=false;
-    private String dataDirectory=".";
+    private boolean removeData = false;
+    private String dataDirectory = ".";
 
     public boolean isRemoveData() {
         return removeData;
