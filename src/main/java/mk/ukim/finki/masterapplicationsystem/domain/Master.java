@@ -29,6 +29,9 @@ public class Master {
     private Major major;
 
     @ManyToOne
+    private Student student;
+
+    @ManyToOne
     private Professor mentor;
 
     @ManyToOne
@@ -37,10 +40,43 @@ public class Master {
     @ManyToOne
     private Professor committeeSecond;
 
-    public Master(OffsetDateTime dateTime, OffsetDateTime finishedDate, OffsetDateTime masterDefenseDate, String archiveNumber) {
+    public Master(OffsetDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public void setDateTime(OffsetDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public void setFinishedDate(OffsetDateTime finishedDate) {
         this.finishedDate = finishedDate;
+    }
+
+    public void setMasterDefenseDate(OffsetDateTime masterDefenseDate) {
         this.masterDefenseDate = masterDefenseDate;
+    }
+
+    public void setArchiveNumber(String archiveNumber) {
         this.archiveNumber = archiveNumber;
+    }
+
+    public void setMajor(Major major) {
+        this.major = major;
+    }
+
+    public void setMentor(Professor mentor) {
+        this.mentor = mentor;
+    }
+
+    public void setCommitteeFirst(Professor committeeFirst) {
+        this.committeeFirst = committeeFirst;
+    }
+
+    public void setCommitteeSecond(Professor committeeSecond) {
+        this.committeeSecond = committeeSecond;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
