@@ -1,12 +1,12 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Getter
+@Data
 public class Process {
 
     @Id
@@ -17,8 +17,4 @@ public class Process {
 
     @Enumerated(EnumType.STRING)
     private ProcessState processState;
-
-    public Process() {
-        this.processState = ProcessState.APPLICATION;
-    }
 }

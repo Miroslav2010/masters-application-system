@@ -1,20 +1,16 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.time.OffsetDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@NoArgsConstructor
+@Data
 public class Attachment extends Step {
 
     @OneToOne
     private Document document;
-
-    public Attachment(OffsetDateTime created, int orderNumber, String name, Document document) {
-        super(created, orderNumber, name);
-        this.document = document;
-    }
 }

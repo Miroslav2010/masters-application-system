@@ -1,16 +1,14 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Getter
 @Entity
-@NoArgsConstructor
+@Data
 public class Document {
 
     @Id
@@ -19,9 +17,4 @@ public class Document {
     private OffsetDateTime dateUploaded;
 
     private String location;
-
-    public Document(OffsetDateTime dateUploaded, String location) {
-        this.dateUploaded = dateUploaded;
-        this.location = location;
-    }
 }
