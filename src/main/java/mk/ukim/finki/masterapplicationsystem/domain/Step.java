@@ -1,7 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,8 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
-@Getter
+@Data
 public class Step {
 
     @Id
@@ -30,9 +28,5 @@ public class Step {
         this.closed = null;
         this.orderNumber = orderNumber;
         this.name = name;
-    }
-
-    public void setClosed(OffsetDateTime closed) {
-        this.closed = closed;
     }
 }

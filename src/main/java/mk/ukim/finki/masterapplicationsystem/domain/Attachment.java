@@ -1,13 +1,14 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.time.OffsetDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@NoArgsConstructor
+@Data
 public class Attachment extends Step {
 
     @OneToOne
@@ -18,7 +19,4 @@ public class Attachment extends Step {
         this.document = document;
     }
 
-    public void setDocument(Document document) {
-        this.document = document;
-    }
 }

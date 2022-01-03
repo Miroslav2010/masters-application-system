@@ -1,6 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -9,7 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
+@Data
 public class Remark {
 
     @Id
@@ -24,11 +24,4 @@ public class Remark {
     private String remark;
 
     private OffsetDateTime dateTime;
-
-    public Remark(Person person, Step step, String remark, OffsetDateTime dateTime) {
-        this.person = person;
-        this.step = step;
-        this.remark = remark;
-        this.dateTime = dateTime;
-    }
 }

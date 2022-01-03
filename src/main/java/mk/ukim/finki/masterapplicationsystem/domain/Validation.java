@@ -1,11 +1,13 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@NoArgsConstructor
+@Data
 public class Validation extends Step {
 
     public Validation(Step step) {

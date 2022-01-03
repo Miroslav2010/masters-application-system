@@ -1,10 +1,12 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
+@Data
 public class Secretary extends Person {
 }

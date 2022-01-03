@@ -1,12 +1,12 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
+@Data
 public class StepValidation {
 
     @Id
@@ -20,10 +20,4 @@ public class StepValidation {
 
     @Enumerated(EnumType.STRING)
     private ValidationStatus validationStatus;
-
-    public StepValidation(Person person, Validation validation, ValidationStatus validationStatus) {
-        this.person = person;
-        this.validation = validation;
-        this.validationStatus = validationStatus;
-    }
 }

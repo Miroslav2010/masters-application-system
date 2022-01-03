@@ -1,13 +1,14 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import java.time.OffsetDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@NoArgsConstructor
+@Data
 public class MasterTopic extends Step {
 
     private String topic;
@@ -41,30 +42,6 @@ public class MasterTopic extends Step {
         this.application = application;
         this.mentorApproval = mentorApproval;
         this.biography = biography;
-        this.supplement = supplement;
-    }
-
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setApplication(Document application) {
-        this.application = application;
-    }
-
-    public void setMentorApproval(Document mentorApproval) {
-        this.mentorApproval = mentorApproval;
-    }
-
-    public void setBiography(Document biography) {
-        this.biography = biography;
-    }
-
-    public void setSupplement(Document supplement) {
         this.supplement = supplement;
     }
 }

@@ -23,7 +23,7 @@ public class DocumentServiceImplementation implements DocumentService {
         this.documentRepository = documentRepository;
     }
 
-    private Document save(UUID userId, MultipartFile file,String subFolder) throws IOException {
+    private Document save(String userId, MultipartFile file,String subFolder) throws IOException {
         String fileLocation = fileRepository.save(userId,file,subFolder);
         Document doc = new Document(OffsetDateTime.now(), fileLocation);
         try{
@@ -34,19 +34,19 @@ public class DocumentServiceImplementation implements DocumentService {
         }
         return doc;
     }
-    public Document saveApplicationDocument(UUID userId, MultipartFile file) throws IOException {
+    public Document saveApplicationDocument(String userId, MultipartFile file) throws IOException {
         return this.save(userId,file,"/documents-application");
     }
-    public Document saveDraft(UUID userId, MultipartFile file) throws IOException {
+    public Document saveDraft(String userId, MultipartFile file) throws IOException {
         return this.save(userId,file,"/drafts");
     }
-    public Document saveRepost(UUID userId, MultipartFile file) throws IOException {
+    public Document saveRepost(String userId, MultipartFile file) throws IOException {
         return this.save(userId,file,"/reports");
     }
-    public Document findDocumentById(UUID id){
+    public Document findDocumentById(String id){
         return documentRepository.getById(id);
     }
-    public Resource findFileByDocumentId(UUID id) throws FileNotFoundException {
+    public Resource findFileByDocumentId(String  id) throws FileNotFoundException {
         Document doc = documentRepository.getById(id);
         String fileLocation = doc.getLocation();
         return fileRepository.findByLocation(fileLocation);
