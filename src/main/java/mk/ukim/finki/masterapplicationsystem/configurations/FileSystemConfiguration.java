@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "filesystem")
 public class FileSystemConfiguration {
-    private boolean removeData=false;
-    private String dataDirectory=".";
+    private boolean removeData = false;
+    private String dataDirectory = ".";
 
     public boolean isRemoveData() {
         return removeData;
