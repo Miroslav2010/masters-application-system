@@ -27,6 +27,9 @@ public class Master {
     private Major major;
 
     @ManyToOne
+    private Student student;
+
+    @ManyToOne
     private Professor mentor;
 
     @ManyToOne
@@ -34,4 +37,8 @@ public class Master {
 
     @ManyToOne
     private Professor committeeSecond;
+
+    public Master(OffsetDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
 }

@@ -26,4 +26,22 @@ public class MasterTopic extends Step {
 
     @OneToOne
     private Document supplement;
+
+    public MasterTopic(
+            Step step,
+            String topic,
+            String description,
+            Document application,
+            Document mentorApproval,
+            Document biography,
+            Document supplement) {
+
+        super(step.getOrderNumber(), step.getName());
+        this.topic = topic;
+        this.description = description;
+        this.application = application;
+        this.mentorApproval = mentorApproval;
+        this.biography = biography;
+        this.supplement = supplement;
+    }
 }

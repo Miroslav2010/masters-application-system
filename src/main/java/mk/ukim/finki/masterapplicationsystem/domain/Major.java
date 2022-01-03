@@ -14,4 +14,9 @@ public class Major {
     private final String id = UUID.randomUUID().toString();
 
     private String name;
+
+    public Major(String name) {
+        this.name = name;
+    }
+
 }

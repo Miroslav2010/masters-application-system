@@ -22,4 +22,11 @@ public class Step {
 
     @ManyToOne
     private Process process;
+
+    public Step(int orderNumber, String name) {
+        this.created = OffsetDateTime.now();
+        this.closed = null;
+        this.orderNumber = orderNumber;
+        this.name = name;
+    }
 }

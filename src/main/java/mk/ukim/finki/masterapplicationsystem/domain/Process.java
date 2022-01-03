@@ -17,4 +17,8 @@ public class Process {
 
     @Enumerated(EnumType.STRING)
     private ProcessState processState;
+
+    public Process() {
+        this.processState = ProcessState.APPLICATION;
+    }
 }

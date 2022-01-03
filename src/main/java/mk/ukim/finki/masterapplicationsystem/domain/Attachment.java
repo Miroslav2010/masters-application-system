@@ -13,4 +13,10 @@ public class Attachment extends Step {
 
     @OneToOne
     private Document document;
+
+    public Attachment(Step step, Document document) {
+        super(step.getOrderNumber(), step.getName());
+        this.document = document;
+    }
+
 }
