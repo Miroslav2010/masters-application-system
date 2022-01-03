@@ -1,7 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,8 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
-@Getter
+@Data
 public class Master {
 
     @Id
@@ -36,11 +34,4 @@ public class Master {
 
     @ManyToOne
     private Professor committeeSecond;
-
-    public Master(OffsetDateTime dateTime, OffsetDateTime finishedDate, OffsetDateTime masterDefenseDate, String archiveNumber) {
-        this.dateTime = dateTime;
-        this.finishedDate = finishedDate;
-        this.masterDefenseDate = masterDefenseDate;
-        this.archiveNumber = archiveNumber;
-    }
 }

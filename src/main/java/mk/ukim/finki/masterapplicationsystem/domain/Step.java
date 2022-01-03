@@ -1,7 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,8 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@NoArgsConstructor
-@Getter
+@Data
 public class Step {
 
     @Id
@@ -24,11 +22,4 @@ public class Step {
 
     @ManyToOne
     private Process process;
-
-    public Step(OffsetDateTime created, int orderNumber, String name) {
-        this.created = created;
-        this.closed = null;
-        this.orderNumber = orderNumber;
-        this.name = name;
-    }
 }

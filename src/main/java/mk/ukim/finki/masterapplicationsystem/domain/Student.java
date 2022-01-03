@@ -1,20 +1,14 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.Entity;
-import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Getter
-@NoArgsConstructor
+@Data
 public class Student extends Person {
 
     private String index;
-
-    public Student(String fullName, List<Role> roles, String index) {
-        super(fullName, roles);
-        this.index = index;
-    }
 }
