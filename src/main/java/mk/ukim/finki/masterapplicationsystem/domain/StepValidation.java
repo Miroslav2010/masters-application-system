@@ -20,4 +20,14 @@ public class StepValidation {
 
     @Enumerated(EnumType.STRING)
     private ValidationStatus validationStatus;
+
+    public StepValidation() {
+    }
+
+    public StepValidation(Person person, Validation validation, ValidationStatus validationStatus) {
+        this.person = person;
+        this.validation = validation;
+        this.validationStatus = validationStatus;
+    }
+
 }

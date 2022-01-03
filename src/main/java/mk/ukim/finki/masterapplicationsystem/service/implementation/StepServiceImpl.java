@@ -33,8 +33,8 @@ public class StepServiceImpl implements StepService {
 
     @Override
     public Step getStepFromProcess(String processId, String name) {
-        return stepRepository.findByProcessIdAndName(processId, name).stream().max(Comparator.comparing(Step::getOrderNumber))
-                .orElseThrow(() -> new RuntimeException("There is not a step with name " + name + " for process with id " + processId));
+        return stepRepository.findByProcessIdAndNameOrderByOrderNumberDesc(processId, name)
+                .orElseThrow(() -> new RuntimeException(String.format("Step with name %s for the process with id %s was not found", name, processId)));
     }
 
     private Step createNewStep(String processId, String name) {
@@ -72,7 +72,6 @@ public class StepServiceImpl implements StepService {
         // TODO: Viktor integration with document service
         return stepRepository.save(masterTopic);
     }
-
 
     @Override
     public MasterTopic editMasterTopicBiography(String processId, String masterTopicName, Document biography) {

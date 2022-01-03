@@ -17,4 +17,13 @@ public class Document {
     private OffsetDateTime dateUploaded;
 
     private String location;
+
+    public Document(OffsetDateTime dateUploaded, String location) {
+        this.dateUploaded = dateUploaded;
+        this.location = location;
+    }
+
+    public Document() {
+
+    }
 }
