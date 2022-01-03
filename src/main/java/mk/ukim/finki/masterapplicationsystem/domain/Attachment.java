@@ -13,8 +13,12 @@ public class Attachment extends Step {
     @OneToOne
     private Document document;
 
-    public Attachment(OffsetDateTime created, int orderNumber, String name, Document document) {
-        super(created, orderNumber, name);
+    public Attachment(Step step, Document document) {
+        super(step.getOrderNumber(), step.getName());
+        this.document = document;
+    }
+
+    public void setDocument(Document document) {
         this.document = document;
     }
 }

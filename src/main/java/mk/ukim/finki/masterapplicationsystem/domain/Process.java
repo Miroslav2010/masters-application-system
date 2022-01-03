@@ -21,4 +21,12 @@ public class Process {
     public Process() {
         this.processState = ProcessState.APPLICATION;
     }
+
+    public void setProcessState(ProcessState processState) {
+        this.processState = processState;
+    }
+
+    public void setMaster(Master master) {
+        this.master = master;
+    }
 }

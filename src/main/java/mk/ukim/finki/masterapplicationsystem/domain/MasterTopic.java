@@ -27,9 +27,7 @@ public class MasterTopic extends Step {
     private Document supplement;
 
     public MasterTopic(
-            OffsetDateTime created,
-            int orderNumber,
-            String name,
+            Step step,
             String topic,
             String description,
             Document application,
@@ -37,12 +35,36 @@ public class MasterTopic extends Step {
             Document biography,
             Document supplement) {
 
-        super(created, orderNumber, name);
+        super(step.getOrderNumber(), step.getName());
         this.topic = topic;
         this.description = description;
         this.application = application;
         this.mentorApproval = mentorApproval;
         this.biography = biography;
+        this.supplement = supplement;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setApplication(Document application) {
+        this.application = application;
+    }
+
+    public void setMentorApproval(Document mentorApproval) {
+        this.mentorApproval = mentorApproval;
+    }
+
+    public void setBiography(Document biography) {
+        this.biography = biography;
+    }
+
+    public void setSupplement(Document supplement) {
         this.supplement = supplement;
     }
 }

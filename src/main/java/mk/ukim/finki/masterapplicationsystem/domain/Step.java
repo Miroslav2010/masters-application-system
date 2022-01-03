@@ -25,10 +25,14 @@ public class Step {
     @ManyToOne
     private Process process;
 
-    public Step(OffsetDateTime created, int orderNumber, String name) {
-        this.created = created;
+    public Step(int orderNumber, String name) {
+        this.created = OffsetDateTime.now();
         this.closed = null;
         this.orderNumber = orderNumber;
         this.name = name;
+    }
+
+    public void setClosed(OffsetDateTime closed) {
+        this.closed = closed;
     }
 }
