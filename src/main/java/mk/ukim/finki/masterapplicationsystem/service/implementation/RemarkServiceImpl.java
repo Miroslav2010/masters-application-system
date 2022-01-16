@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 public class RemarkServiceImpl implements RemarkService {
-    private final RemarkMapper remarkMapper = (RemarkMapper) RemarkMapper.INSTANCE;
+    private final RemarkMapper remarkMapper = RemarkMapper.INSTANCE;
     private final RemarkRepository remarkRepository;
     private final StepService stepService;
 
