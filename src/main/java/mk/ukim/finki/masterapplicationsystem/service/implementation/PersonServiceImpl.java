@@ -6,6 +6,8 @@ import mk.ukim.finki.masterapplicationsystem.domain.exceptions.InvalidPersonIdEx
 import mk.ukim.finki.masterapplicationsystem.domain.mapper.PersonMapper;
 import mk.ukim.finki.masterapplicationsystem.repository.PersonRepository;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,7 @@ public class PersonServiceImpl implements PersonService {
 
     private final PersonRepository personRepository;
     private final PersonMapper personMapper;
+    private final Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
 
     public PersonServiceImpl(PersonRepository personRepository) {
         this.personRepository = personRepository;
@@ -43,6 +46,9 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person createPerson(PersonDto person) {
-        return this.personRepository.save(personMapper.toDomain(person));
+
+        Person p = this.personRepository.save(personMapper.toDomain(person));
+        logger.info("Created ne person with id: %s and name: %s",p.getId(),p.getFullName());
+        return p;
     }
 }
