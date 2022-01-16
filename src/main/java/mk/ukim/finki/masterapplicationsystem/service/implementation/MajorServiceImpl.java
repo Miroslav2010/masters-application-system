@@ -3,11 +3,13 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.Major;
 import mk.ukim.finki.masterapplicationsystem.repository.MajorRepository;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class MajorServiceImpl implements MajorService {
-    private MajorRepository majorRepository;
+    private final MajorRepository majorRepository;
 
     public MajorServiceImpl(MajorRepository majorRepository) {
         this.majorRepository = majorRepository;

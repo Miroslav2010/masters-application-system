@@ -1,7 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.repository;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
-import mk.ukim.finki.masterapplicationsystem.domain.Role;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

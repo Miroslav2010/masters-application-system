@@ -2,12 +2,14 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
-import mk.ukim.finki.masterapplicationsystem.domain.ProcessState;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.ProcessRepository;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ProcessServiceImpl implements ProcessService {
-    ProcessRepository processRepository;
+    private final ProcessRepository processRepository;
 
     public ProcessServiceImpl(ProcessRepository processRepository) {
         this.processRepository = processRepository;

@@ -1,4 +1,4 @@
-package mk.ukim.finki.masterapplicationsystem.domain;
+package mk.ukim.finki.masterapplicationsystem.domain.enumeration;
 
 public enum ValidationStatus {
     WAITING,

@@ -13,4 +13,8 @@ public class Validation extends Step {
     public Validation(Step step) {
         super(step.getOrderNumber(), step.getName());
     }
+
+    public Validation() {
+
+    }
 }

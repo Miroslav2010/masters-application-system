@@ -5,15 +5,18 @@ import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.repository.RemarkRepository;
 import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class RemarkServiceImpl implements RemarkService {
-    private RemarkRepository remarkRepository;
-    private StepService stepService;
+    private final RemarkRepository remarkRepository;
+    private final StepService stepService;
 
-    public RemarkServiceImpl(RemarkRepository remarkRepository) {
+    public RemarkServiceImpl(RemarkRepository remarkRepository, StepService stepService) {
         this.remarkRepository = remarkRepository;
+        this.stepService = stepService;
     }
 
     @Override

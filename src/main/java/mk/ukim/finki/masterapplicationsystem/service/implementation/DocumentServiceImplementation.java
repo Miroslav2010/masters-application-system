@@ -5,6 +5,7 @@ import mk.ukim.finki.masterapplicationsystem.repository.DocumentRepository;
 import mk.ukim.finki.masterapplicationsystem.repository.FileRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -14,9 +15,10 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Service
 public class DocumentServiceImplementation implements DocumentService {
-    private FileRepository fileRepository;
-    private DocumentRepository documentRepository;
+    private final FileRepository fileRepository;
+    private final DocumentRepository documentRepository;
 
     public DocumentServiceImplementation(FileRepository fileRepository, DocumentRepository documentRepository) {
         this.fileRepository = fileRepository;

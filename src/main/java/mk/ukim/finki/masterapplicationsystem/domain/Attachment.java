@@ -19,4 +19,11 @@ public class Attachment extends Step {
         this.document = document;
     }
 
+    public Attachment(Step step) {
+        super(step.getOrderNumber(), step.getName());
+    }
+
+    public Attachment() {
+
+    }
 }

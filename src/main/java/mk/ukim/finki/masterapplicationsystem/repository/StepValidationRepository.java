@@ -1,7 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.repository;
 
 import mk.ukim.finki.masterapplicationsystem.domain.StepValidation;
-import mk.ukim.finki.masterapplicationsystem.domain.ValidationStatus;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

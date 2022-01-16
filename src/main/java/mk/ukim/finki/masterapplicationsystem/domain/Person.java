@@ -1,6 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
 import lombok.Data;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ public class Person {
     private final String id = UUID.randomUUID().toString();
     private String fullName;
 
-    @ElementCollection(targetClass=Role.class)
+    @ElementCollection(targetClass= Role.class)
     @Enumerated(EnumType.STRING)
     private final List<Role> roles = new ArrayList<>();
 }

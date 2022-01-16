@@ -1,4 +1,4 @@
-package mk.ukim.finki.masterapplicationsystem.domain;
+package mk.ukim.finki.masterapplicationsystem.domain.enumeration;
 
 public enum ProcessState {
 
@@ -14,6 +14,7 @@ public enum ProcessState {
     DRAFT_NNK_REVIEW("ННК валидира"),
     SECOND_DRAFT_SECRETARY_REVIEW("Секретар валидира"),
     DRAFT_COMMITTEE_REVIEW("Проверка на драфт"),
+    STUDENT_CHANGES_DRAFT("Студент менува драфт верзија"),
     REPORT_REVIEW("Валидирање на извештај"),
     REPORT_SECRETARY_REVIEW("Секретар валидира извештај"),
     REPORT_STUDENT_SERVICE("Студентса служба валидира извештај"),

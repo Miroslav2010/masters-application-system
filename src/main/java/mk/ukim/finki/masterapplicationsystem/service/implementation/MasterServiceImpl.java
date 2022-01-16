@@ -6,12 +6,14 @@ import mk.ukim.finki.masterapplicationsystem.domain.Professor;
 import mk.ukim.finki.masterapplicationsystem.domain.Student;
 import mk.ukim.finki.masterapplicationsystem.repository.MasterRepository;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
+import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
+@Service
 public class MasterServiceImpl implements MasterService {
-    private MasterRepository masterRepository;
+    private final MasterRepository masterRepository;
 
     public MasterServiceImpl(MasterRepository masterRepository) {
         this.masterRepository = masterRepository;
@@ -43,15 +45,15 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
-    public Master saveMaster(OffsetDateTime dateTimeCreated, Student student) {
-        Master master = new Master(dateTimeCreated);
+    public Master saveMaster(Student student) {
+        Master master = new Master();
         master.setStudent(student);
         return masterRepository.save(master);
     }
 
     @Override
-    public Master saveMasterWithAllData(String id, Student student, Professor mentor, Professor firstCommittee, Professor secondCommittee, Major major) {
-        Master master = findMasterById(id);
+    public Master saveMasterWithAllData(Student student, Professor mentor, Professor firstCommittee, Professor secondCommittee, Major major) {
+        Master master = new Master();
         master.setStudent(student);
         master.setMentor(mentor);
         master.setCommitteeFirst(firstCommittee);

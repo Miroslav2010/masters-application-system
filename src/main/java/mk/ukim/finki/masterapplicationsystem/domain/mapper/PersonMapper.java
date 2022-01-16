@@ -2,6 +2,7 @@ package mk.ukim.finki.masterapplicationsystem.domain.mapper;
 
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.PersonDto;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
