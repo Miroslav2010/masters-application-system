@@ -3,6 +3,8 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.repository.StepRepository;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -15,6 +17,8 @@ public class StepServiceImpl implements StepService {
     public StepServiceImpl(StepRepository stepRepository) {
         this.stepRepository = stepRepository;
     }
+
+    private final Logger logger = LoggerFactory.getLogger(StepServiceImpl.class);
 
     @Override
     public List<Step> findAllSteps(String processId) {
@@ -53,7 +57,9 @@ public class StepServiceImpl implements StepService {
     public Validation saveValidation(String processId, String name) {
         // TODO: check if this action can be done
         Validation validation = new Validation(createNewStep(processId, name));
-        return stepRepository.save(validation);
+        validation = stepRepository.save(validation);
+        logger.info("Validation step saved for process: %s");
+        return validation;
     }
 
     @Override
@@ -70,7 +76,9 @@ public class StepServiceImpl implements StepService {
         // TODO: Check if there is already a master topic step for process
         MasterTopic masterTopic = new MasterTopic(createNewStep(processId, name), topic, description, application, mentorApproval, biography, supplement);
         // TODO: Viktor integration with document service
-        return stepRepository.save(masterTopic);
+        masterTopic = stepRepository.save(masterTopic);
+        logger.info("Saved topic for master with process id: %s",processId);
+        return masterTopic;
     }
 
     @Override
@@ -78,7 +86,9 @@ public class StepServiceImpl implements StepService {
         MasterTopic masterTopic = getMasterTopicFromProcess(processId, masterTopicName);
         // TODO: Viktor integration with document service
         masterTopic.setBiography(biography);
-        return stepRepository.save(masterTopic);
+        masterTopic = stepRepository.save(masterTopic);
+        logger.info("Edited biography for master with process id: %s",processId);
+        return masterTopic;
     }
 
     @Override
@@ -92,7 +102,9 @@ public class StepServiceImpl implements StepService {
         // TODO: check if this action can be done
         Attachment attachment = new Attachment(createNewStep(processId, name), document);
         // TODO: Viktor integration with document service
-        return stepRepository.save(attachment);
+        attachment = stepRepository.save(attachment);
+        logger.info("Saved attachment for process: %s with name",processId);
+        return attachment;
     }
 
     @Override
@@ -100,13 +112,18 @@ public class StepServiceImpl implements StepService {
         Attachment attachment = getAttachmentFromProcess(processId, attachmentStepName);
         // TODO: Viktor integration with document service
         attachment.setDocument(document);
-        return stepRepository.save(attachment);
+        logger.info("Edited attachment for process: %s with name",processId);
+        attachment = stepRepository.save(attachment);
+        return attachment;
     }
 
     @Override
     public Step setClosedDateTime(String stepId, OffsetDateTime closedDateTime) {
         Step step = findStepById(stepId);
         step.setClosed(closedDateTime);
-        return stepRepository.save(step);
+        step  =stepRepository.save(step);
+        logger.info("Closed step with id: %s at %s",stepId,closedDateTime.toString());
+        return step;
+
     }
 }

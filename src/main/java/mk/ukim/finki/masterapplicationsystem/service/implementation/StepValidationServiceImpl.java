@@ -7,12 +7,16 @@ import mk.ukim.finki.masterapplicationsystem.domain.ValidationStatus;
 import mk.ukim.finki.masterapplicationsystem.repository.StepValidationRepository;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class StepValidationServiceImpl implements StepValidationService {
     private StepValidationRepository stepValidationRepository;
     private StepService stepService;
+
+    private final Logger logger = LoggerFactory.getLogger(StepValidationServiceImpl.class);
 
     public StepValidationServiceImpl(StepValidationRepository stepValidationRepository, StepService stepService) {
         this.stepValidationRepository = stepValidationRepository;
@@ -34,7 +38,9 @@ public class StepValidationServiceImpl implements StepValidationService {
         // TODO: Check if this action can be done
         Validation validation = (Validation) stepService.findStepById(validationId);
         StepValidation stepValidation = new StepValidation(person, validation, validationStatus);
-        return stepValidationRepository.save(stepValidation);
+        stepValidation = stepValidationRepository.save(stepValidation);
+        logger.info("Step with id: {} validated by {} with status {}",validationId,person.getFullName(),validationStatus);
+        return stepValidation;
     }
 
     @Override

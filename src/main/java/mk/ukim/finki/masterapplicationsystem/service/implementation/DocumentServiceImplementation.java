@@ -4,6 +4,8 @@ import mk.ukim.finki.masterapplicationsystem.domain.Document;
 import mk.ukim.finki.masterapplicationsystem.repository.DocumentRepository;
 import mk.ukim.finki.masterapplicationsystem.repository.FileRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +19,7 @@ import java.util.UUID;
 public class DocumentServiceImplementation implements DocumentService {
     private FileRepository fileRepository;
     private DocumentRepository documentRepository;
+    private final Logger logger = LoggerFactory.getLogger(DocumentServiceImplementation.class);
 
     public DocumentServiceImplementation(FileRepository fileRepository, DocumentRepository documentRepository) {
         this.fileRepository = fileRepository;
@@ -32,6 +35,7 @@ public class DocumentServiceImplementation implements DocumentService {
             fileRepository.delete(fileLocation);
             throw e;
         }
+        logger.info(String.format("Saved file %s in database for user with id %s",file.getName(),userId));
         return doc;
     }
     public Document saveApplicationDocument(String userId, MultipartFile file) throws IOException {
