@@ -7,18 +7,18 @@ import mk.ukim.finki.masterapplicationsystem.domain.mapper.RemarkMapper;
 import mk.ukim.finki.masterapplicationsystem.repository.RemarkRepository;
 import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
+import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
 public class RemarkServiceImpl implements RemarkService {
-    private RemarkRepository remarkRepository;
-    private StepService stepService;
-    private final RemarkMapper remarkMapper = (RemarkMapper) RemarkMapper.INSTANCE;
+    private final RemarkMapper remarkMapper = RemarkMapper.INSTANCE;
+    private final RemarkRepository remarkRepository;
+    private final StepService stepService;
 
     private final Logger logger = LoggerFactory.getLogger(RemarkServiceImpl.class);
 

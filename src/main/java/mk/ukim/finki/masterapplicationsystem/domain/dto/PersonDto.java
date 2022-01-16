@@ -1,7 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.domain.dto;
 
 import lombok.Data;
-import mk.ukim.finki.masterapplicationsystem.domain.Role;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 
 import java.util.ArrayList;
 import java.util.List;

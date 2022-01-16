@@ -29,4 +29,8 @@ public class Step {
         this.orderNumber = orderNumber;
         this.name = name;
     }
+
+    public Step() {
+
+    }
 }

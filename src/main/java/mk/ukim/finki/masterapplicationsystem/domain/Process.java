@@ -1,6 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.domain;
 
 import lombok.Data;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 
 import javax.persistence.*;
 import java.util.UUID;

@@ -2,15 +2,17 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
-import mk.ukim.finki.masterapplicationsystem.domain.ProcessState;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.ProcessRepository;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
+import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Service
 public class ProcessServiceImpl implements ProcessService {
-    ProcessRepository processRepository;
     private final Logger logger = LoggerFactory.getLogger(ProcessServiceImpl.class);
+    private final ProcessRepository processRepository;
 
     public ProcessServiceImpl(ProcessRepository processRepository) {
         this.processRepository = processRepository;

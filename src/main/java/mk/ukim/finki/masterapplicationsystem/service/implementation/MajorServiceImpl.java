@@ -3,13 +3,15 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.Major;
 import mk.ukim.finki.masterapplicationsystem.repository.MajorRepository;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
+import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+@Service
 public class MajorServiceImpl implements MajorService {
-    private MajorRepository majorRepository;
+    private final MajorRepository majorRepository;
 
     private final Logger logger = LoggerFactory.getLogger(MajorServiceImpl.class);
     public MajorServiceImpl(MajorRepository majorRepository) {

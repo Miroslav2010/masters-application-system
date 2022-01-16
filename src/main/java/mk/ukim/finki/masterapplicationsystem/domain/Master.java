@@ -38,7 +38,8 @@ public class Master {
     @ManyToOne
     private Professor committeeSecond;
 
-    public Master(OffsetDateTime dateTime) {
-        this.dateTime = dateTime;
+    public Master() {
+        this.dateTime = OffsetDateTime.now();
     }
+
 }

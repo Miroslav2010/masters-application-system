@@ -2,6 +2,7 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.PersonDto;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.exceptions.InvalidPersonIdException;
 import mk.ukim.finki.masterapplicationsystem.domain.mapper.PersonMapper;
 import mk.ukim.finki.masterapplicationsystem.repository.PersonRepository;

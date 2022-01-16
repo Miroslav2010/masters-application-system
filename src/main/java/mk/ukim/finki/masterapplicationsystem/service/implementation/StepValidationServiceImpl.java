@@ -3,18 +3,20 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.StepValidation;
 import mk.ukim.finki.masterapplicationsystem.domain.Validation;
-import mk.ukim.finki.masterapplicationsystem.domain.ValidationStatus;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import mk.ukim.finki.masterapplicationsystem.repository.StepValidationRepository;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class StepValidationServiceImpl implements StepValidationService {
-    private StepValidationRepository stepValidationRepository;
-    private StepService stepService;
+    private final StepValidationRepository stepValidationRepository;
+    private final StepService stepService;
 
     private final Logger logger = LoggerFactory.getLogger(StepValidationServiceImpl.class);
 
@@ -34,13 +36,17 @@ public class StepValidationServiceImpl implements StepValidationService {
     }
 
     @Override
-    public StepValidation save(String validationId, Person person, ValidationStatus validationStatus) {
+    public StepValidation createStepValidation(Validation validation, Person person) {
         // TODO: Check if this action can be done
-        Validation validation = (Validation) stepService.findStepById(validationId);
-        StepValidation stepValidation = new StepValidation(person, validation, validationStatus);
-        stepValidation = stepValidationRepository.save(stepValidation);
-        logger.info("Step with id: {} validated by {} with status {}",validationId,person.getFullName(),validationStatus);
-        return stepValidation;
+        StepValidation stepValidation = new StepValidation(person, validation, ValidationStatus.WAITING);
+        return stepValidationRepository.save(stepValidation);
+    }
+
+    @Override
+    public StepValidation changeStepValidationStatus(String stepValidationId, ValidationStatus validationStatus) {
+        StepValidation stepValidation = findById(stepValidationId);
+        stepValidation.setValidationStatus(validationStatus);
+        return stepValidationRepository.save(stepValidation);
     }
 
     @Override

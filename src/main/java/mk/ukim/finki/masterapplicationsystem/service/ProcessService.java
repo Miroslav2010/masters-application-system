@@ -2,7 +2,7 @@ package mk.ukim.finki.masterapplicationsystem.service;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
-import mk.ukim.finki.masterapplicationsystem.domain.ProcessState;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 
 public interface ProcessService {
 

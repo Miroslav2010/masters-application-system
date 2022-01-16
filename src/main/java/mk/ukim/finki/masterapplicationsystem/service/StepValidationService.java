@@ -2,7 +2,8 @@ package mk.ukim.finki.masterapplicationsystem.service;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.StepValidation;
-import mk.ukim.finki.masterapplicationsystem.domain.ValidationStatus;
+import mk.ukim.finki.masterapplicationsystem.domain.Validation;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 
 import java.util.List;
 
@@ -12,7 +13,9 @@ public interface StepValidationService {
 
     List<StepValidation> findByValidationId(String validationId);
 
-    StepValidation save(String validationId, Person person, ValidationStatus validationStatus);
+    StepValidation createStepValidation(Validation validation, Person person);
+
+    StepValidation changeStepValidationStatus(String stepValidationId, ValidationStatus validationStatus);
 
     List<StepValidation> findAllByStatus(ValidationStatus validationStatus);
 

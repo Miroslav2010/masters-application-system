@@ -44,4 +44,8 @@ public class MasterTopic extends Step {
         this.biography = biography;
         this.supplement = supplement;
     }
+
+    public MasterTopic() {
+        super();
+    }
 }

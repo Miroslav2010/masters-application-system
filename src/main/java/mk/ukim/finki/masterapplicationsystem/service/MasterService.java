@@ -20,9 +20,9 @@ public interface MasterService {
 
     OffsetDateTime getMasterDefencedDateTime(String id);
 
-    Master saveMaster(OffsetDateTime dateTimeCreated, Student student);
+    Master saveMaster(Student student);
 
-    Master saveMasterWithAllData(String id, Student student, Professor mentor, Professor firstCommittee, Professor secondCommittee, Major major);
+    Master saveMasterWithAllData(Student student, Professor mentor, Professor firstCommittee, Professor secondCommittee, Major major);
 
     Boolean isMasterFinished(String id);
 

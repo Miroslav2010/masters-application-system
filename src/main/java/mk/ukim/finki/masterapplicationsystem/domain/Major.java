@@ -19,4 +19,7 @@ public class Major {
         this.name = name;
     }
 
+    public Major() {
+
+    }
 }

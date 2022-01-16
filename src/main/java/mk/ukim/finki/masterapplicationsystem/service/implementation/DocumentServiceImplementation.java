@@ -7,6 +7,7 @@ import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -16,10 +17,11 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Service
 public class DocumentServiceImplementation implements DocumentService {
-    private FileRepository fileRepository;
-    private DocumentRepository documentRepository;
     private final Logger logger = LoggerFactory.getLogger(DocumentServiceImplementation.class);
+    private final FileRepository fileRepository;
+    private final DocumentRepository documentRepository;
 
     public DocumentServiceImplementation(FileRepository fileRepository, DocumentRepository documentRepository) {
         this.fileRepository = fileRepository;
