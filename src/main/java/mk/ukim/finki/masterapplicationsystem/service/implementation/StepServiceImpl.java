@@ -4,7 +4,9 @@ import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.StepRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
+import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
+import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,11 +23,17 @@ public class StepServiceImpl implements StepService {
     private final StepRepository stepRepository;
     private final DocumentService documentService;
     private final ProcessServiceImpl processService;
+    private final ProcessStateHelperService processStateHelperService;
+    private final StepValidationService stepValidationService;
+    private final RemarkService remarkService;
 
-    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService) {
+    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService, ProcessStateHelperService processStateHelperService, StepValidationService stepValidationService, RemarkService remarkService) {
         this.stepRepository = stepRepository;
         this.documentService = documentService;
         this.processService = processService;
+        this.processStateHelperService = processStateHelperService;
+        this.stepValidationService = stepValidationService;
+        this.remarkService = remarkService;
     }
 
     @Override
@@ -53,7 +61,14 @@ public class StepServiceImpl implements StepService {
         Optional<Step> step = getActiveStep(processId);
         int stepOrderNumber = step.map(value -> value.getOrderNumber() + 1).orElse(1);
         ProcessState processState = processService.getProcessState(processId);
-        return new Step(stepOrderNumber, processState.toString());
+        Step newStep = new Step(stepOrderNumber, processState.toString());
+        assignResponsibleForStep(processId, newStep);
+        return newStep;
+    }
+
+    private void assignResponsibleForStep(String processId, Step step) {
+        processStateHelperService.getResponsiblePersonsForStep(processId)
+                .forEach(person -> remarkService.saveNewRemark(person, step));
     }
 
     @Override
@@ -66,7 +81,14 @@ public class StepServiceImpl implements StepService {
     public Validation saveValidation(String processId) {
         // TODO: check if this action can be done
         Validation validation = new Validation(createNewStep(processId));
-        return stepRepository.save(validation);
+        validation = stepRepository.save(validation);
+        createStepValidation(processId, validation);
+        return validation;
+    }
+
+    private void createStepValidation(String processId, Validation validation) {
+        processStateHelperService.getResponsiblePersonsForStep(processId)
+                .forEach(person -> stepValidationService.createStepValidation(validation, person));
     }
 
     @Override

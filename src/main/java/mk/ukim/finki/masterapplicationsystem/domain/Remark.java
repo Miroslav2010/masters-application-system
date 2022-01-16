@@ -24,4 +24,13 @@ public class Remark {
     private String remark;
 
     private OffsetDateTime dateTime;
+
+    public Remark(Person person, Step step) {
+        this.person = person;
+        this.step = step;
+    }
+
+    public Remark() {
+
+    }
 }

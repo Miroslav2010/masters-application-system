@@ -14,11 +14,9 @@ import java.util.List;
 @Service
 public class StepValidationServiceImpl implements StepValidationService {
     private final StepValidationRepository stepValidationRepository;
-    private final StepService stepService;
 
-    public StepValidationServiceImpl(StepValidationRepository stepValidationRepository, StepService stepService) {
+    public StepValidationServiceImpl(StepValidationRepository stepValidationRepository) {
         this.stepValidationRepository = stepValidationRepository;
-        this.stepService = stepService;
     }
 
     @Override

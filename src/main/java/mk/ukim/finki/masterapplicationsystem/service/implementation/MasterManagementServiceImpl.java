@@ -9,10 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.List;
 
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.*;
 
@@ -24,40 +22,26 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     private final PersonService personService;
     private final MajorService majorService;
     private final StepValidationService stepValidationService;
+    private final PermissionService permissionService;
 
     public MasterManagementServiceImpl(MasterService masterService, ProcessService processService, StepService stepService,
-                                       PersonService personService, MajorService majorService, StepValidationService stepValidationService) {
+                                       PersonService personService, MajorService majorService, StepValidationService stepValidationService, ProcessStateHelperService processStateHelperService, PermissionService permissionService) {
         this.masterService = masterService;
         this.processService = processService;
         this.stepService = stepService;
         this.personService = personService;
         this.majorService = majorService;
         this.stepValidationService = stepValidationService;
+        this.permissionService = permissionService;
     }
 
     private Professor findProfessorById(String id) {
         return (Professor) personService.getPerson(id);
     }
 
-    private List<Person> getResponsiblePersonsForStep(String processId) {
-        ProcessState processState = processService.getProcessState(processId);
-        List<Person> responsiblePersons = new ArrayList<>();
-        Master master = processService.getProcessMaster(processId);
-        if (EnumSet.of(INITIAL_MENTOR_REVIEW, DRAFT_MENTOR_REVIEW).contains(processState))
-            responsiblePersons.add(master.getMentor());
-        else if (EnumSet.of(APPLICATION, DOCUMENT_APPLICATION, STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState))
-            responsiblePersons.add(master.getStudent());
-        else if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, REPORT_REVIEW).contains(processState)) {
-            responsiblePersons.add(master.getCommitteeFirst());
-            responsiblePersons.add(master.getCommitteeSecond());
-        }
-        return responsiblePersons;
-    }
-
     private void setUpNewValidation(String processId) {
         // for student service, secretary and nnk we do not assign people
-        Validation validation = stepService.saveValidation(processId);
-        getResponsiblePersonsForStep(processId).forEach(person -> stepValidationService.createStepValidation(validation, person));
+        stepService.saveValidation(processId);
     }
 
     private void setUpDraftStep(String processId) {

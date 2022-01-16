@@ -1,5 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
+import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.Remark;
 import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.repository.RemarkRepository;
@@ -38,5 +39,11 @@ public class RemarkServiceImpl implements RemarkService {
     @Override
     public List<Remark> findAllByPersonId(String personId) {
         return remarkRepository.findAllByPersonId(personId);
+    }
+
+    public Remark saveNewRemark(Person person, Step step) {
+        //get active user
+        Remark remark = new Remark(person, step);
+        return remarkRepository.save(remark);
     }
 }
