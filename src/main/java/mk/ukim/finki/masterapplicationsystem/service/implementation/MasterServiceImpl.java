@@ -7,12 +7,15 @@ import mk.ukim.finki.masterapplicationsystem.domain.Student;
 import mk.ukim.finki.masterapplicationsystem.repository.MasterRepository;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
 public class MasterServiceImpl implements MasterService {
+    private final Logger logger = LoggerFactory.getLogger(MasterServiceImpl.class);
     private final MasterRepository masterRepository;
 
     public MasterServiceImpl(MasterRepository masterRepository) {
@@ -48,7 +51,9 @@ public class MasterServiceImpl implements MasterService {
     public Master saveMaster(Student student) {
         Master master = new Master();
         master.setStudent(student);
-        return masterRepository.save(master);
+        master = masterRepository.save(master);
+        logger.info("Saved new Master by %s",student.getFullName());
+        return master;
     }
 
     @Override
@@ -59,7 +64,9 @@ public class MasterServiceImpl implements MasterService {
         master.setCommitteeFirst(firstCommittee);
         master.setCommitteeSecond(secondCommittee);
         master.setMajor(major);
-        return masterRepository.save(master);
+        master = masterRepository.save(master);
+        logger.debug(String.format("Saved new master with all data by %s",student.getFullName()));
+        return master;
     }
 
     @Override
@@ -76,13 +83,16 @@ public class MasterServiceImpl implements MasterService {
     public Master markMasterAsFinished(String id, OffsetDateTime finishedDateTime) {
         Master master = findMasterById(id);
         master.setFinishedDate(finishedDateTime);
-        return masterRepository.save(master);
+        master = masterRepository.save(master);
+        logger.debug(String.format("Master with id: %s marked as finished",id));
+        return master;
     }
 
     @Override
     public Master marMasterAsDefenced(String id, OffsetDateTime defencedDateTime) {
         Master master = findMasterById(id);
         master.setMasterDefenseDate(defencedDateTime);
+        logger.debug(String.format("Master with id: %s marked as defended",id));
         return masterRepository.save(master);
     }
 
@@ -90,21 +100,26 @@ public class MasterServiceImpl implements MasterService {
     public Master setArchiveNumber(String id, String archiveNumber) {
         Master master = findMasterById(id);
         master.setArchiveNumber(archiveNumber);
-        return masterRepository.save(master);
+        master =  masterRepository.save(master);
+        logger.debug(String.format("Master with id: %s has archive number %s",archiveNumber));
+        return master;
     }
 
     @Override
     public Master setMajor(String id, Major major) {
         Master master = findMasterById(id);
         master.setMajor(major);
-        return masterRepository.save(master);
+        master =  masterRepository.save(master);
+        return master;
     }
 
     @Override
     public Master assignMentor(String id, Professor mentor) {
         Master master = findMasterById(id);
         master.setMentor(mentor);
-        return masterRepository.save(master);
+        master =  masterRepository.save(master);
+        logger.debug(String.format("Mentor %s set for master with id: %s",mentor.getFullName(),id));
+        return master;
     }
 
     @Override
@@ -112,7 +127,9 @@ public class MasterServiceImpl implements MasterService {
         Master master = findMasterById(id);
         master.setCommitteeFirst(firstCommittee);
         master.setCommitteeSecond(secondCommittee);
-        return masterRepository.save(master);
+        master = masterRepository.save(master);
+        logger.debug(String.format("Assigned members %s and %s to master with id: %s",firstCommittee.getFullName(),secondCommittee.getFullName(),id));
+        return master;
     }
 
     @Override
