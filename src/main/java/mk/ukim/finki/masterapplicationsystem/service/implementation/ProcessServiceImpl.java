@@ -6,9 +6,12 @@ import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.ProcessRepository;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class ProcessServiceImpl implements ProcessService {
+    private final Logger logger = LoggerFactory.getLogger(ProcessServiceImpl.class);
     private final ProcessRepository processRepository;
 
     public ProcessServiceImpl(ProcessRepository processRepository) {
@@ -45,14 +48,18 @@ public class ProcessServiceImpl implements ProcessService {
             throw new RuntimeException("Process with id " + id + " can not go on next step because it is on the last step");
         int processStateId = process.getProcessState().ordinal() + 1;
         process.setProcessState(ProcessState.values()[processStateId]);
-        return processRepository.save(process);
+        process = processRepository.save(process);
+        logger.info("Moved process to next step: %s, previous was %s",ProcessState.values()[processStateId],ProcessState.values()[processStateId]);
+        return process;
     }
 
     @Override
     public Process goToStep(String id, ProcessState state) {
         Process process = findProcessById(id);
         process.setProcessState(state);
-        return processRepository.save(process);
+        process = processRepository.save(process);
+        logger.info("Process with id: %s was set to state %s",id,state);
+        return process;
     }
 
     @Override

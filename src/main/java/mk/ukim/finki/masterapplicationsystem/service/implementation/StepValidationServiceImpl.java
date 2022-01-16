@@ -7,6 +7,8 @@ import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus
 import mk.ukim.finki.masterapplicationsystem.repository.StepValidationRepository;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.List;
 @Service
 public class StepValidationServiceImpl implements StepValidationService {
     private final StepValidationRepository stepValidationRepository;
+
+    private final Logger logger = LoggerFactory.getLogger(StepValidationServiceImpl.class);
 
     public StepValidationServiceImpl(StepValidationRepository stepValidationRepository) {
         this.stepValidationRepository = stepValidationRepository;
