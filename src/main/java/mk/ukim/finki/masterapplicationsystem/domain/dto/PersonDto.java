@@ -12,4 +12,5 @@ public class PersonDto {
     private String fullName;
     private final List<Role> roles = new ArrayList<>();
     private String index;
+    private String password;
 }
