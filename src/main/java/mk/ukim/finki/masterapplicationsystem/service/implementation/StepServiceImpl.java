@@ -4,18 +4,19 @@ import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.StepRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
-import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.DOCUMENT_APPLICATION;
 
 @Service
@@ -25,21 +26,22 @@ public class StepServiceImpl implements StepService {
     private final ProcessServiceImpl processService;
     private final ProcessStateHelperService processStateHelperService;
     private final StepValidationService stepValidationService;
-    private final RemarkService remarkService;
+//    private final RemarkService remarkService;
 
-    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService, ProcessStateHelperService processStateHelperService, StepValidationService stepValidationService, RemarkService remarkService) {
+    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService, ProcessStateHelperService processStateHelperService, StepValidationService stepValidationService) {
         this.stepRepository = stepRepository;
         this.documentService = documentService;
         this.processService = processService;
         this.processStateHelperService = processStateHelperService;
         this.stepValidationService = stepValidationService;
-        this.remarkService = remarkService;
+//        this.remarkService = remarkService;
     }
 
     private final Logger logger = LoggerFactory.getLogger(StepServiceImpl.class);
 
     @Override
     public List<Step> findAllSteps(String processId) {
+        //not returning steps
         return stepRepository.findAllByProcessId(processId);
     }
 
@@ -49,8 +51,9 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public Optional<Step> getActiveStep(String processId) {
-        return findAllSteps(processId).stream().max(Comparator.comparing(Step::getOrderNumber));
+    public Step getActiveStep(String processId) {
+        return findAllSteps(processId).stream().max(Comparator.comparing(Step::getOrderNumber))
+                .orElseThrow(() -> new RuntimeException(String.format("Step of the processId %s was not found", processId)));
     }
 
     @Override
@@ -60,18 +63,14 @@ public class StepServiceImpl implements StepService {
     }
 
     private Step createNewStep(String processId) {
-        Optional<Step> step = getActiveStep(processId);
-        int stepOrderNumber = step.map(value -> value.getOrderNumber() + 1).orElse(1);
+        int stepOrderNumber = 1;
+        if (findAllSteps(processId).size() != 0)
+            stepOrderNumber = getActiveStep(processId).getOrderNumber() + 1;
         ProcessState processState = processService.getProcessState(processId);
         Step newStep = new Step(stepOrderNumber, processState.toString());
-        assignResponsibleForStep(processId, newStep);
         return newStep;
     }
 
-    private void assignResponsibleForStep(String processId, Step step) {
-        processStateHelperService.getResponsiblePersonsForStep(processId)
-                .forEach(person -> remarkService.saveNewRemark(person, step));
-    }
 
     @Override
     public Validation getValidationFromProcess(String processId, String name) {
@@ -111,7 +110,7 @@ public class StepServiceImpl implements StepService {
         Document supplementDocument = documentService.saveApplicationDocument(userId, supplement);
         MasterTopic masterTopic = new MasterTopic(createNewStep(processId), topic, description, applicationDocument,
                 mentorApprovalDocument, biographyDocument, supplementDocument);
-        logger.info("Saved topic for master with process id: %s",processId);
+        logger.info("Saved topic for master with process id: %s", processId);
         return stepRepository.save(masterTopic);
     }
 
@@ -121,7 +120,7 @@ public class StepServiceImpl implements StepService {
         Document biography = documentService.saveApplicationDocument(new Student().getId(), file);
         masterTopic.setBiography(biography);
         masterTopic = stepRepository.save(masterTopic);
-        logger.info("Edited biography for master with process id: %s",processId);
+        logger.info("Edited biography for master with process id: %s", processId);
         return masterTopic;
     }
 
@@ -161,7 +160,7 @@ public class StepServiceImpl implements StepService {
         Document draftDocument = documentService.saveApplicationDocument(new Student().getId(), draft);
         Attachment attachment = new Attachment(createNewStep(processId), draftDocument);
         attachment = stepRepository.save(attachment);
-        logger.info("Saved attachment for process: %s with name",processId);
+        logger.info("Saved attachment for process: %s with name", processId);
         return attachment;
     }
 
@@ -176,7 +175,7 @@ public class StepServiceImpl implements StepService {
         Attachment attachment = getAttachmentFromProcess(processId, attachmentStepName);
         Document document = documentService.saveApplicationDocument(new Student().getId(), file);
         attachment.setDocument(document);
-        logger.info("Edited attachment for process: %s with name",processId);
+        logger.info("Edited attachment for process: %s with name", processId);
         attachment = stepRepository.save(attachment);
         return attachment;
     }
@@ -185,8 +184,8 @@ public class StepServiceImpl implements StepService {
     public Step setClosedDateTime(String stepId, OffsetDateTime closedDateTime) {
         Step step = findStepById(stepId);
         step.setClosed(closedDateTime);
-        step  =stepRepository.save(step);
-        logger.info("Closed step with id: %s at %s",stepId,closedDateTime.toString());
+        step = stepRepository.save(step);
+        logger.info("Closed step with id: %s at %s", stepId, closedDateTime.toString());
         return step;
 
     }

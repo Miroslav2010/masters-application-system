@@ -8,9 +8,11 @@ import mk.ukim.finki.masterapplicationsystem.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.List;
 
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.*;
 
@@ -49,35 +51,51 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     private void setUpNewStep(String processId) {
+        // if method is transactional this would not be the active process state
         ProcessState processState = processService.getProcessState(processId);
-        if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT, APPLICATION_FINISHED, FINISHED).contains(processState))
+        if (EnumSet.of(APPLICATION_FINISHED, FINISHED).contains(processState))
+            return;
+        if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState))
             setUpDraftStep(processId);
         else
             setUpNewValidation(processId);
     }
 
+//    it's best to create remark when someone leave remark
+//    private void assignResponsibleForStep(String processId, Step step) {
+//        processStateHelperService.getResponsiblePersonsForStep(processId)
+//                .forEach(person -> remarkService.saveNewRemark(person, step));
+//    }
+
     private Process processNextState(String processId) {
         return processService.nextState(processId);
     }
 
+    @Transactional
     @Override
     public Process createMaster(String mentorId, String firstCommitteeId, String secondCommitteeId, String majorId) {
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        permissionService.canPersonCreateMaster(student.getId());
         Professor mentor = findProfessorById(mentorId);
         Professor firstCommittee = findProfessorById(firstCommitteeId);
         Professor secondCommittee = findProfessorById(secondCommitteeId);
         Major major = majorService.findMajorById(majorId);
         // TODO: here we should get the active user
-        Master master = masterService.saveMasterWithAllData((Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get(),
-                mentor, firstCommittee, secondCommittee, major);
+        Master master = masterService.saveMasterWithAllData(student, mentor, firstCommittee, secondCommittee, major);
         Process masterProcess = processService.save(master);
         return processNextState(masterProcess.getId());
     }
 
+    @Transactional
     @Override
     public MasterTopic createMasterTopic(String processId, String topic, String description, MultipartFile biography,
                                          MultipartFile mentorApproval, MultipartFile application, MultipartFile supplement) throws IOException {
-        MasterTopic masterTopic = stepService.saveMasterTopic(processId, personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get().getId(),
-                topic, description, application, mentorApproval, biography, supplement);
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        permissionService.canPersonCreateMasterTopic(processId, student.getId());
+        MasterTopic masterTopic = stepService.saveMasterTopic(processId, student.getId(), topic, description,
+                application, mentorApproval, biography, supplement);
         processNextState(processId);
         setUpNewStep(processId);
         return masterTopic;
@@ -93,37 +111,72 @@ public class MasterManagementServiceImpl implements MasterManagementService {
             return STUDENT_CHANGES_DRAFT;
     }
 
+    private void checkIfPersonAlreadyValidated(Step step, String personId) {
+        List<StepValidation> stepValidations = stepValidationService.findAllByValidationId(step.getId());
+        if (stepValidations.stream().anyMatch(s -> s.getPerson().getId().equals(personId)))
+            throw new RuntimeException(String.format("Person with id: %s already validated this step.", personId));
+    }
+
+    private boolean allAssignedValidated(Step step) {
+        List<StepValidation> stepValidations = stepValidationService.findAllByValidationId(step.getId());
+        return stepValidations.stream()
+                .filter(s -> s.getValidationStatus() != ValidationStatus.WAITING).count() == (stepValidations.size() - 1);
+    }
+
+    private boolean checkIfSomeoneRefused(Step step, ValidationStatus validationStatus) {
+        List<StepValidation> stepValidations = stepValidationService.findAllByValidationId(step.getId());
+        return stepValidations.stream().anyMatch(s -> s.getValidationStatus() == ValidationStatus.REFUSED)
+                || validationStatus == ValidationStatus.REFUSED;
+    }
 
     private void validate(String processId, ValidationStatus validationStatus) {
-        Step step = stepService.getActiveStep(processId).orElseThrow(() ->
-                new RuntimeException(String.format("Step of the processId %s was not found", processId)));
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        Step step = stepService.getActiveStep(processId);
+        checkIfPersonAlreadyValidated(step, student.getId());
         stepValidationService.changeStepValidationStatus(step.getId(), validationStatus);
-        // if go back to master topic - should be added to setUpNewStep
-        if (validationStatus.equals(ValidationStatus.REFUSED))
+        if (!allAssignedValidated(step))
+            return;
+        if (checkIfSomeoneRefused(step, validationStatus)) {
             processService.goToStep(processId, firstStepFromPhase(processService.getProcessState(processId)));
+            setUpNewStep(processId);
+        }
         else
             processNextState(processId);
     }
 
+    @Transactional
     @Override
     public void validateStep(String processId, ValidationStatus validationStatus) {
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        permissionService.canPersonValidateMaster(processId, student.getId());
         validate(processId, validationStatus);
         setUpNewStep(processId);
     }
 
+    @Transactional
     @Override
     public Master setArchiveNumber(String processId, String archiveNumber) {
         Master master = processService.getProcessMaster(processId);
         return masterService.setArchiveNumber(master.getId(), archiveNumber);
     }
 
+    @Transactional
     @Override
     public Attachment uploadDraft(String processId, MultipartFile draft) throws IOException {
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        permissionService.canPersonUploadAttachment(processId, student.getId());
         return stepService.saveAttachment(processId, processService.getProcessState(processId).toString(), draft);
     }
 
+    @Transactional
     @Override
     public Process confirmUpload(String processId) {
+        //active user
+        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        permissionService.canPersonUploadAttachment(processId, student.getId());
         Process process = processNextState(processId);
         setUpNewStep(processId);
         return process;

@@ -29,8 +29,8 @@ public class StepValidationServiceImpl implements StepValidationService {
     }
 
     @Override
-    public List<StepValidation> findByValidationId(String validationId) {
-        return stepValidationRepository.findByValidationId(validationId);
+    public List<StepValidation> findAllByValidationId(String validationId) {
+        return stepValidationRepository.findAllByValidationId(validationId);
     }
 
     @Override

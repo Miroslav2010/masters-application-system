@@ -1,6 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.repository.implementation;
 
-import mk.ukim.finki.masterapplicationsystem.configurations.FileSystemConfiguration;
+import mk.ukim.finki.masterapplicationsystem.configuration.FileSystemConfiguration;
 import mk.ukim.finki.masterapplicationsystem.repository.FileRepository;
 import org.aspectj.util.FileUtil;
 import org.springframework.core.io.FileSystemResource;

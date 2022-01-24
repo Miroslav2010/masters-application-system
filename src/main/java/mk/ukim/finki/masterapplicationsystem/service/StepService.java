@@ -17,7 +17,7 @@ public interface StepService {
 
     Step findStepById(String id);
 
-    Optional<Step> getActiveStep(String processId);
+    Step getActiveStep(String processId);
 
     Step getStepFromProcess(String processId, String name);
 

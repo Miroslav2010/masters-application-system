@@ -1,4 +1,4 @@
-package mk.ukim.finki.masterapplicationsystem.configurations;
+package mk.ukim.finki.masterapplicationsystem.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

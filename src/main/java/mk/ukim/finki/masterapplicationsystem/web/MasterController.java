@@ -7,8 +7,12 @@ import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/api/master")
@@ -41,9 +45,50 @@ public class MasterController {
 
     @PostMapping("/master-topic")
     public MasterTopic createMasterTopic(@RequestBody MasterTopicStepDTO masterTopicStepDTO) throws IOException {
+        MultipartFile multipartFile = new MultipartFile() {
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return null;
+            }
+
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
         return masterManagementService.createMasterTopic(masterTopicStepDTO.getProcessId(), masterTopicStepDTO.getTopic(),
-                masterTopicStepDTO.getDescription(), masterTopicStepDTO.getBiography(), masterTopicStepDTO.getMentorApproval(),
-                masterTopicStepDTO.getApplication(), masterTopicStepDTO.getSupplement());
+                masterTopicStepDTO.getDescription(), multipartFile, multipartFile,
+                multipartFile, multipartFile);
     }
 
     @PostMapping("/validation-step")

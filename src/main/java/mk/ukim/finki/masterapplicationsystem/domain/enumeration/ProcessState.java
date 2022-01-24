@@ -15,6 +15,7 @@ public enum ProcessState {
     SECOND_DRAFT_SECRETARY_REVIEW("Секретар валидира"),
     DRAFT_COMMITTEE_REVIEW("Проверка на драфт"),
     STUDENT_CHANGES_DRAFT("Студент менува драфт верзија"),
+    MENTOR_REPORT("Ментор затвора циклус на поправки и прикачува извештај"),
     REPORT_REVIEW("Валидирање на извештај"),
     REPORT_SECRETARY_REVIEW("Секретар валидира извештај"),
     REPORT_STUDENT_SERVICE("Студентса служба валидира извештај"),

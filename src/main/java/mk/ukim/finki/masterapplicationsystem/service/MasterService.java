@@ -28,6 +28,8 @@ public interface MasterService {
 
     Boolean isMasterDefenced(String id);
 
+    Boolean doesStudentHaveActiveMaster(String personId);
+
     Master markMasterAsFinished(String id, OffsetDateTime finishedDateTime);
 
     Master marMasterAsDefenced(String id, OffsetDateTime defencedDateTime);

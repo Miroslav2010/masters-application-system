@@ -2,7 +2,6 @@ package mk.ukim.finki.masterapplicationsystem.web;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.Remark;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.PersonDto;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.RemarkDto;
 import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +24,11 @@ public class RemarkController {
     }
 
     @PostMapping("/{processId}")
-    public ResponseEntity createRemark(@PathVariable String processId,@RequestBody String remark) {
+    public ResponseEntity createRemark(@PathVariable String processId, @RequestBody String remark) {
         //TODO: get current person
         Person person = new Person();
-        RemarkDto remarkDto = new RemarkDto(remark,person);
-        remarkService.saveRemark(processId,remarkDto);
+        RemarkDto remarkDto = new RemarkDto(remark, person);
+        remarkService.saveRemark(processId, remarkDto);
         return ResponseEntity.ok().build();
     }
 

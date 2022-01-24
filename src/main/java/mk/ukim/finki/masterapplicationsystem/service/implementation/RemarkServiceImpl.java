@@ -4,13 +4,15 @@ import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.Remark;
 import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.RemarkDto;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.mapper.RemarkMapper;
 import mk.ukim.finki.masterapplicationsystem.repository.RemarkRepository;
+import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -32,8 +34,9 @@ public class RemarkServiceImpl implements RemarkService {
     public Remark findById(String id) {
         return remarkRepository.findById(id).orElseThrow(() -> new RuntimeException("Remark with id " + id + " was not found"));
     }
-    public Remark saveRemark(String processId,RemarkDto remarkDto){
-        Step currentStep = stepService.getStepFromProcess(processId,"");
+
+    public Remark saveRemark(String processId, RemarkDto remarkDto) {
+        Step currentStep = stepService.getActiveStep(processId);
         Remark remark = remarkMapper.remarkDtoToRemark(remarkDto);
         remark.setStep(currentStep);
         remark.setDateTime(OffsetDateTime.now());

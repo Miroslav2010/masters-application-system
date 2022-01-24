@@ -11,7 +11,7 @@ public interface StepValidationService {
 
     StepValidation findById(String id);
 
-    List<StepValidation> findByValidationId(String validationId);
+    List<StepValidation> findAllByValidationId(String validationId);
 
     StepValidation createStepValidation(Validation validation, Person person);
 
