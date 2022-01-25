@@ -7,8 +7,14 @@ import java.util.List;
 
 public interface PersonService {
     List<Person> getAll();
+
     Person getPerson(String id);
+
     List<Person> getProfessors();
+
     void deletePerson(String id);
+
     Person createPerson(PersonDto person);
+
+    Person getLoggedInUser();
 }

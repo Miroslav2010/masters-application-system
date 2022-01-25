@@ -6,6 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;

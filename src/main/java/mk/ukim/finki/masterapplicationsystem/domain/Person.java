@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.*;
 
+import static javax.persistence.FetchType.EAGER;
+
 @Entity
 @Data
 public class Person implements UserDetails {
@@ -18,18 +20,18 @@ public class Person implements UserDetails {
 
     private String password;
 
-    @ElementCollection(targetClass= Role.class)
+    @ElementCollection(targetClass= Role.class, fetch = EAGER)
     @Enumerated(EnumType.STRING)
     private final List<Role> roles = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return roles;
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return password;
     }
 
     @Override

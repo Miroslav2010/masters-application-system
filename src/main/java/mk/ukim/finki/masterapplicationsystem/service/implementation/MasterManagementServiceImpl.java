@@ -74,14 +74,12 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Transactional
     @Override
     public Process createMaster(String mentorId, String firstCommitteeId, String secondCommitteeId, String majorId) {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        Student student = (Student) personService.getLoggedInUser();
         permissionService.canPersonCreateMaster(student.getId());
         Professor mentor = findProfessorById(mentorId);
         Professor firstCommittee = findProfessorById(firstCommitteeId);
         Professor secondCommittee = findProfessorById(secondCommitteeId);
         Major major = majorService.findMajorById(majorId);
-        // TODO: here we should get the active user
         Master master = masterService.saveMasterWithAllData(student, mentor, firstCommittee, secondCommittee, major);
         Process masterProcess = processService.save(master);
         return processNextState(masterProcess.getId());
@@ -91,10 +89,9 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Override
     public MasterTopic createMasterTopic(String processId, String topic, String description, MultipartFile biography,
                                          MultipartFile mentorApproval, MultipartFile application, MultipartFile supplement) throws IOException {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
-        permissionService.canPersonCreateMasterTopic(processId, student.getId());
-        MasterTopic masterTopic = stepService.saveMasterTopic(processId, student.getId(), topic, description,
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonCreateMasterTopic(processId, loggedInUser.getId());
+        MasterTopic masterTopic = stepService.saveMasterTopic(processId, loggedInUser.getId(), topic, description,
                 application, mentorApproval, biography, supplement);
         processNextState(processId);
         setUpNewStep(processId);
@@ -130,10 +127,9 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     private void validate(String processId, ValidationStatus validationStatus) {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
+        Person loggedInUser = personService.getLoggedInUser();
         Step step = stepService.getActiveStep(processId);
-        checkIfPersonAlreadyValidated(step, student.getId());
+        checkIfPersonAlreadyValidated(step, loggedInUser.getId());
         stepValidationService.changeStepValidationStatus(step.getId(), validationStatus);
         if (!allAssignedValidated(step))
             return;
@@ -148,9 +144,8 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Transactional
     @Override
     public void validateStep(String processId, ValidationStatus validationStatus) {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
-        permissionService.canPersonValidateMaster(processId, student.getId());
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonValidateMaster(processId, loggedInUser.getId());
         validate(processId, validationStatus);
         setUpNewStep(processId);
     }
@@ -165,18 +160,16 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Transactional
     @Override
     public Attachment uploadDraft(String processId, MultipartFile draft) throws IOException {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
-        permissionService.canPersonUploadAttachment(processId, student.getId());
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonUploadAttachment(processId, loggedInUser.getId());
         return stepService.saveAttachment(processId, processService.getProcessState(processId).toString(), draft);
     }
 
     @Transactional
     @Override
     public Process confirmUpload(String processId) {
-        //active user
-        Student student = (Student) personService.getAll().stream().sorted(Comparator.comparing(Person::getFullName)).findFirst().get();
-        permissionService.canPersonUploadAttachment(processId, student.getId());
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonUploadAttachment(processId, loggedInUser.getId());
         Process process = processNextState(processId);
         setUpNewStep(processId);
         return process;
