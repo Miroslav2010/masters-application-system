@@ -5,9 +5,9 @@ import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.ProcessRepository;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
-import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProcessServiceImpl implements ProcessService {
@@ -49,7 +49,7 @@ public class ProcessServiceImpl implements ProcessService {
         int processStateId = process.getProcessState().ordinal() + 1;
         process.setProcessState(ProcessState.values()[processStateId]);
         process = processRepository.save(process);
-        logger.info("Moved process to next step: %s, previous was %s",ProcessState.values()[processStateId],ProcessState.values()[processStateId]);
+        logger.info("Moved process to next step: {}, previous was {}", ProcessState.values()[processStateId], ProcessState.values()[processStateId]);
         return process;
     }
 
@@ -58,7 +58,7 @@ public class ProcessServiceImpl implements ProcessService {
         Process process = findProcessById(id);
         process.setProcessState(state);
         process = processRepository.save(process);
-        logger.info("Process with id: %s was set to state %s",id,state);
+        logger.info("Process with id: {} was set to state {}", id, state);
         return process;
     }
 

@@ -16,13 +16,11 @@ import java.util.List;
 @Service
 public class StepValidationServiceImpl implements StepValidationService {
     private final StepValidationRepository stepValidationRepository;
-    private final StepService stepService;
 
     private final Logger logger = LoggerFactory.getLogger(StepValidationServiceImpl.class);
 
-    public StepValidationServiceImpl(StepValidationRepository stepValidationRepository, StepService stepService) {
+    public StepValidationServiceImpl(StepValidationRepository stepValidationRepository) {
         this.stepValidationRepository = stepValidationRepository;
-        this.stepService = stepService;
     }
 
     @Override
@@ -31,8 +29,8 @@ public class StepValidationServiceImpl implements StepValidationService {
     }
 
     @Override
-    public List<StepValidation> findByValidationId(String validationId) {
-        return stepValidationRepository.findByValidationId(validationId);
+    public List<StepValidation> findAllByValidationId(String validationId) {
+        return stepValidationRepository.findAllByValidationId(validationId);
     }
 
     @Override

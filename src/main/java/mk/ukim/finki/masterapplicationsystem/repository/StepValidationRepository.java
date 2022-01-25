@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface StepValidationRepository extends JpaRepository<StepValidation, String> {
 
-    List<StepValidation> findByValidationId(String validationId);
+    List<StepValidation> findAllByValidationId(String validationId);
 
     List<StepValidation> findAllByValidationStatus(ValidationStatus validationStatus);
 
