@@ -2,10 +2,12 @@ package mk.ukim.finki.masterapplicationsystem.web;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.PersonDto;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -47,5 +49,10 @@ public class PersonController {
     @GetMapping("/professors")
     public ResponseEntity<List<Person>> getAllProfessors() {
         return ResponseEntity.ok(personService.getProfessors());
+    }
+
+    @GetMapping("/roles")
+    public ResponseEntity<List<Role>> getAllRoles() {
+        return ResponseEntity.ok(Arrays.asList(Role.values()));
     }
 }

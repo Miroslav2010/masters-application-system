@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {PageLayout} from "./PageLayout";
 import {Card, CardContent, Typography} from "@mui/material";
 
@@ -53,6 +53,8 @@ const content = [
     'Студентска служба архивира и валидира',
     'Процесот е завршен и се чека одбрана на трудот'
 ];
+
+
 
 export const Home = () => {
     return (
