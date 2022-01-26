@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.*;
 
@@ -109,7 +110,8 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     private void checkIfPersonAlreadyValidated(Step step, String personId) {
-        List<StepValidation> stepValidations = stepValidationService.findAllByValidationId(step.getId());
+        List<StepValidation> stepValidations = stepValidationService.findAllByValidationId(step.getId()).stream()
+                .filter(s -> s.getValidationStatus() != ValidationStatus.WAITING).collect(Collectors.toList());
         if (stepValidations.stream().anyMatch(s -> s.getPerson().getId().equals(personId)))
             throw new RuntimeException(String.format("Person with id: %s already validated this step.", personId));
     }

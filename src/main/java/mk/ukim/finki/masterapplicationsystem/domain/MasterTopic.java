@@ -35,8 +35,7 @@ public class MasterTopic extends Step {
             Document mentorApproval,
             Document biography,
             Document supplement) {
-
-        super(step.getOrderNumber(), step.getName());
+        super(step);
         this.topic = topic;
         this.description = description;
         this.application = application;

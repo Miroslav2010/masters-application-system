@@ -1,7 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
+import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
-import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.StepRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.DOCUMENT_APPLICATION;
 
@@ -66,8 +65,8 @@ public class StepServiceImpl implements StepService {
         int stepOrderNumber = 1;
         if (findAllSteps(processId).size() != 0)
             stepOrderNumber = getActiveStep(processId).getOrderNumber() + 1;
-        ProcessState processState = processService.getProcessState(processId);
-        Step newStep = new Step(stepOrderNumber, processState.toString());
+        Process process = processService.findProcessById(processId);
+        Step newStep = new Step(stepOrderNumber, process.getProcessState().toString(), process);
         return newStep;
     }
 
