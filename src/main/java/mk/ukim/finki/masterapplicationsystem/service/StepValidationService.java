@@ -1,6 +1,7 @@
 package mk.ukim.finki.masterapplicationsystem.service;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
+import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.domain.StepValidation;
 import mk.ukim.finki.masterapplicationsystem.domain.Validation;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
@@ -11,11 +12,13 @@ public interface StepValidationService {
 
     StepValidation findById(String id);
 
+    StepValidation findByStepIdAndPersonId(String stepId, String personId);
+
     List<StepValidation> findAllByValidationId(String validationId);
 
     StepValidation createStepValidation(Validation validation, Person person);
 
-    StepValidation changeStepValidationStatus(String stepValidationId, ValidationStatus validationStatus);
+    StepValidation changeStepValidationStatus(Step validationStep, Person person, ValidationStatus validationStatus);
 
     List<StepValidation> findAllByStatus(ValidationStatus validationStatus);
 

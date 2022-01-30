@@ -25,26 +25,26 @@ public interface StepService {
 
     Validation saveValidation(String processId);
 
-    MasterTopic getMasterTopicFromProcess(String processId, String name);
+    MasterTopic getMasterTopicFromProcess(String processId);
 
     MasterTopic saveMasterTopic(String processId, String userId, String topic, String description,
                                 MultipartFile application, MultipartFile mentorApproval, MultipartFile biography, MultipartFile supplement) throws IOException;
 
-    MasterTopic editMasterTopicBiography(String processId, String masterTopicName, MultipartFile file) throws IOException;
+    MasterTopic editMasterTopicBiography(String processId, MultipartFile file) throws IOException;
 
-    MasterTopic editMasterTopicMentorApproval(String processId, String masterTopicName, MultipartFile file) throws IOException;
+    MasterTopic editMasterTopicMentorApproval(String processId, MultipartFile file) throws IOException;
 
-    MasterTopic editMasterTopicApplication(String processId, String masterTopicName, MultipartFile file) throws IOException;
+    MasterTopic editMasterTopicApplication(String processId, MultipartFile file) throws IOException;
 
-    MasterTopic editMasterTopicSupplement(String processId, String masterTopicName, MultipartFile file) throws IOException;
+    MasterTopic editMasterTopicSupplement(String processId, MultipartFile file) throws IOException;
 
     Attachment getAttachmentFromProcess(String processId, String name);
 
-    Attachment saveAttachment(String processId, String name, MultipartFile draft) throws IOException;
+    Attachment saveAttachment(String processId, String personId, String name, MultipartFile draft) throws IOException;
 
     Attachment initializeAttachment(String processId);
 
-    Attachment editAttachment(String processId, String attachmentStepName, MultipartFile file) throws IOException;
+    Attachment editAttachment(String processId, String personId, String attachmentStepName, MultipartFile file) throws IOException;
 
     Step setClosedDateTime(String stepId, OffsetDateTime closedDateTime);
 

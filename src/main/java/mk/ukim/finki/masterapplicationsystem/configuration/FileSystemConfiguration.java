@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "filesystem")
 public class FileSystemConfiguration {
     private boolean removeData = false;
-    private String dataDirectory = ".";
+    private String dataDirectory = "MasterDocuments";
 
     public boolean isRemoveData() {
         return removeData;
