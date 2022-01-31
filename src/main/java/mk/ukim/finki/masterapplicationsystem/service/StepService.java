@@ -4,6 +4,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.Attachment;
 import mk.ukim.finki.masterapplicationsystem.domain.MasterTopic;
 import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.domain.Validation;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -40,11 +41,11 @@ public interface StepService {
 
     Attachment getAttachmentFromProcess(String processId, String name);
 
-    Attachment saveAttachment(String processId, String personId, String name, MultipartFile draft) throws IOException;
+    Attachment saveAttachment(String processId, ProcessState processState, String personId, MultipartFile draft) throws IOException;
 
-    Attachment initializeAttachment(String processId);
+    Attachment initializeAttachment(String processId) throws IOException;
 
-    Attachment editAttachment(String processId, String personId, String attachmentStepName, MultipartFile file) throws IOException;
+    Attachment editAttachment(String processId, ProcessState processState, String personId, String attachmentStepName, MultipartFile file) throws IOException;
 
     Step setClosedDateTime(String stepId, OffsetDateTime closedDateTime);
 

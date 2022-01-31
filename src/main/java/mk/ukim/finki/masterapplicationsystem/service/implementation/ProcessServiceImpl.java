@@ -41,16 +41,21 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public Process setState(Process process, int processStateId) {
+        process.setProcessState(ProcessState.values()[processStateId]);
+        process = processRepository.save(process);
+        logger.info("Moved process to next step: {}, previous was {}", ProcessState.values()[processStateId], ProcessState.values()[processStateId]);
+        return process;
+    }
+
+    @Override
     public Process nextState(String id) {
         Process process = findProcessById(id);
         ProcessState processState = process.getProcessState();
         if (processState.equals(ProcessState.FINISHED))
             throw new RuntimeException("Process with id " + id + " can not go on next step because it is on the last step");
         int processStateId = process.getProcessState().ordinal() + 1;
-        process.setProcessState(ProcessState.values()[processStateId]);
-        process = processRepository.save(process);
-        logger.info("Moved process to next step: {}, previous was {}", ProcessState.values()[processStateId], ProcessState.values()[processStateId]);
-        return process;
+        return setState(process, processStateId);
     }
 
     @Override

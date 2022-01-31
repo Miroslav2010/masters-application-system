@@ -67,10 +67,14 @@ public class MasterController {
     }
 
     @PostMapping("/confirm-draft")
-    public Process uploadDraft(@RequestParam String processId) {
+    public Process confirmUpload(@RequestParam String processId) {
         return masterManagementService.confirmUpload(processId);
     }
 
+    @PostMapping("/cancel-revision")
+    public Process cancelTheRevisionLoop(@RequestParam String processId) {
+        return masterManagementService.cancelRevisionLoop(processId);
+    }
 
     //------------------------------------------------------------------------------------------------------------------
 

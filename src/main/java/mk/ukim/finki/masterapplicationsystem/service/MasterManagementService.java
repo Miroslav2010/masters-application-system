@@ -26,7 +26,8 @@ public interface MasterManagementService {
 
     Process confirmUpload(String processId);
 
-    ValidationResponseDTO getValidationDetails(String processId);
+    Process cancelRevisionLoop(String processId);
 
+    ValidationResponseDTO getValidationDetails(String processId);
 
 }
