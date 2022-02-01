@@ -54,6 +54,8 @@ const content = [
     'Процесот е завршен и се чека одбрана на трудот'
 ];
 
+
+
 export const Home = () => {
     return (
       <PageLayout>

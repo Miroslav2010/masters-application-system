@@ -1,8 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.service;
 
-import mk.ukim.finki.masterapplicationsystem.domain.Attachment;
-import mk.ukim.finki.masterapplicationsystem.domain.Master;
-import mk.ukim.finki.masterapplicationsystem.domain.MasterTopic;
+import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;

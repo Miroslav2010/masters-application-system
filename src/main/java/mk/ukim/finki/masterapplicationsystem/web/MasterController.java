@@ -12,6 +12,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -30,6 +31,11 @@ public class MasterController {
     @GetMapping("{id}")
     public Master findMasterById(@PathVariable String id) {
         return masterService.findMasterById(id);
+    }
+
+    @GetMapping("/major")
+    public ResponseEntity<List<Major>> getAllMajors(){
+        return ResponseEntity.ok(majorService.findAllMajors());
     }
 
     @PostMapping("/major")
