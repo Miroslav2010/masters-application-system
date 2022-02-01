@@ -146,9 +146,20 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public void canPersonCancelRevisionLoop(String processId, String personId) {
+        ProcessState processState = processService.getProcessState(processId);
+        if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, STUDENT_CHANGES_DRAFT).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.PROFESSOR);
+            checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.PROFESSOR);
+        }
+        else
+            throw new RuntimeException(String.format("Tried to cancel the revision in step %s that is not revision or change draft.", processState));
+    }
+
+    @Override
     public void canPersonUploadAttachment(String processId, String personId) {
         ProcessState processState = processService.getProcessState(processId);
-        if (processState.equals(STUDENT_DRAFT)) {
+        if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState)) {
             checkIfPersonHaveRole(personId, Role.STUDENT);
             checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.STUDENT);
         } else if (processState.equals(MENTOR_REPORT)) {

@@ -23,11 +23,20 @@ public class Step {
     @ManyToOne
     private Process process;
 
-    public Step(int orderNumber, String name) {
+    public Step(int orderNumber, String name, Process process) {
         this.created = OffsetDateTime.now();
         this.closed = null;
         this.orderNumber = orderNumber;
         this.name = name;
+        this.process = process;
+    }
+
+    public Step(Step step) {
+        this.created = step.getCreated();
+        this.closed = step.getClosed();
+        this.orderNumber = step.getOrderNumber();
+        this.name = step.getName();
+        this.process = step.getProcess();
     }
 
     public Step() {

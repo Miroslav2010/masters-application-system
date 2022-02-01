@@ -35,10 +35,13 @@ public class RemarkServiceImpl implements RemarkService {
         return remarkRepository.findById(id).orElseThrow(() -> new RuntimeException("Remark with id " + id + " was not found"));
     }
 
-    public Remark saveRemark(String processId, RemarkDto remarkDto) {
+    public Remark saveRemark(String processId, Person person, String remarkMessage) {
+        //TODO: Rollback maybe
         Step currentStep = stepService.getActiveStep(processId);
-        Remark remark = remarkMapper.remarkDtoToRemark(remarkDto);
-        remark.setStep(currentStep);
+//        Remark remark = remarkMapper.remarkDtoToRemark(remarkDto);
+        Remark remark = new Remark(person, currentStep);
+//        remark.setStep(currentStep);
+        remark.setRemark(remarkMessage);
         remark.setDateTime(OffsetDateTime.now());
         return remarkRepository.save(remark);
     }
@@ -57,6 +60,13 @@ public class RemarkServiceImpl implements RemarkService {
     @Override
     public List<Remark> findAllByPersonId(String personId) {
         return remarkRepository.findAllByPersonId(personId);
+    }
+
+    @Override
+    public Remark deleteById(String remarkId) {
+        Remark remark = remarkRepository.getById(remarkId);
+        remarkRepository.deleteById(remarkId);
+        return remark;
     }
 
     public Remark saveNewRemark(Person person, Step step) {

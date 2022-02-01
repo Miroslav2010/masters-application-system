@@ -1,23 +1,26 @@
 package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
+import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.StepRepository;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
+import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
-import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.DOCUMENT_APPLICATION;
+import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.*;
 
 @Service
 public class StepServiceImpl implements StepService {
@@ -26,22 +29,23 @@ public class StepServiceImpl implements StepService {
     private final ProcessServiceImpl processService;
     private final ProcessStateHelperService processStateHelperService;
     private final StepValidationService stepValidationService;
+    private final PersonService personService;
 //    private final RemarkService remarkService;
 
-    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService, ProcessStateHelperService processStateHelperService, StepValidationService stepValidationService) {
+    public StepServiceImpl(StepRepository stepRepository, DocumentService documentService, ProcessServiceImpl processService, ProcessStateHelperService processStateHelperService, StepValidationService stepValidationService, PersonService personService) {
         this.stepRepository = stepRepository;
         this.documentService = documentService;
         this.processService = processService;
         this.processStateHelperService = processStateHelperService;
         this.stepValidationService = stepValidationService;
 //        this.remarkService = remarkService;
+        this.personService = personService;
     }
 
     private final Logger logger = LoggerFactory.getLogger(StepServiceImpl.class);
 
     @Override
     public List<Step> findAllSteps(String processId) {
-        //not returning steps
         return stepRepository.findAllByProcessId(processId);
     }
 
@@ -56,9 +60,13 @@ public class StepServiceImpl implements StepService {
                 .orElseThrow(() -> new RuntimeException(String.format("Step of the processId %s was not found", processId)));
     }
 
+    private boolean doesStepExist(String processId, String name) {
+        return stepRepository.findFirstByProcessIdAndNameOrderByOrderNumberDesc(processId, name).isPresent();
+    }
+
     @Override
     public Step getStepFromProcess(String processId, String name) {
-        return stepRepository.findByProcessIdAndNameOrderByOrderNumberDesc(processId, name)
+        return stepRepository.findFirstByProcessIdAndNameOrderByOrderNumberDesc(processId, name)
                 .orElseThrow(() -> new RuntimeException(String.format("Step with name %s for the process with id %s was not found", name, processId)));
     }
 
@@ -66,8 +74,8 @@ public class StepServiceImpl implements StepService {
         int stepOrderNumber = 1;
         if (findAllSteps(processId).size() != 0)
             stepOrderNumber = getActiveStep(processId).getOrderNumber() + 1;
-        ProcessState processState = processService.getProcessState(processId);
-        Step newStep = new Step(stepOrderNumber, processState.toString());
+        Process process = processService.findProcessById(processId);
+        Step newStep = new Step(stepOrderNumber, process.getProcessState().toString(), process);
         return newStep;
     }
 
@@ -93,17 +101,29 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public MasterTopic getMasterTopicFromProcess(String processId, String name) {
-        return (MasterTopic) stepRepository.findAllByProcessIdAndName(processId, name).stream().max(Comparator.comparing(Step::getOrderNumber))
-                .orElseThrow(() -> new RuntimeException("There is not a master topic step with name " + name + " for process with id " + processId));
+    public MasterTopic getMasterTopicFromProcess(String processId) {
+        return (MasterTopic) stepRepository.findAllByProcessIdAndName(processId, DOCUMENT_APPLICATION.toString())
+                .stream().max(Comparator.comparing(Step::getOrderNumber))
+                .orElseThrow(() -> new RuntimeException("There is not a master topic step with name " + DOCUMENT_APPLICATION + " for process with id " + processId));
     }
 
     @Override
     public MasterTopic saveMasterTopic(String processId, String userId, String topic, String description,
                                        MultipartFile biography, MultipartFile mentorApproval, MultipartFile application,
                                        MultipartFile supplement) throws IOException {
-        if (stepRepository.findByProcessIdAndName(processId, DOCUMENT_APPLICATION.toString()).isPresent())
-            throw new RuntimeException("There is a master topic with name " + DOCUMENT_APPLICATION + " for process with id " + processId);
+        // we create master topic for every DOCUMENT_APPLICATION step
+        if(stepRepository.findAllByProcessIdAndName(processId, DOCUMENT_APPLICATION.toString()).size() > 0) {
+            Document biographyDocument = documentService.saveApplicationDocument(userId, biography);
+            Document mentorApprovalDocument = documentService.saveApplicationDocument(userId, mentorApproval);
+            Document applicationDocument = documentService.saveApplicationDocument(userId, application);
+            Document supplementDocument = documentService.saveApplicationDocument(userId, supplement);
+            MasterTopic lastMasterTopic = getMasterTopicFromProcess(processId);
+            lastMasterTopic.setBiography(biographyDocument);
+            lastMasterTopic.setMentorApproval(mentorApprovalDocument);
+            lastMasterTopic.setApplication(applicationDocument);
+            lastMasterTopic.setSupplement(supplementDocument);
+            return stepRepository.save(lastMasterTopic);
+        }
         Document biographyDocument = documentService.saveApplicationDocument(userId, biography);
         Document mentorApprovalDocument = documentService.saveApplicationDocument(userId, mentorApproval);
         Document applicationDocument = documentService.saveApplicationDocument(userId, application);
@@ -115,8 +135,8 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public MasterTopic editMasterTopicBiography(String processId, String masterTopicName, MultipartFile file) throws IOException {
-        MasterTopic masterTopic = getMasterTopicFromProcess(processId, masterTopicName);
+    public MasterTopic editMasterTopicBiography(String processId, MultipartFile file) throws IOException {
+        MasterTopic masterTopic = getMasterTopicFromProcess(processId);
         Document biography = documentService.saveApplicationDocument(new Student().getId(), file);
         masterTopic.setBiography(biography);
         masterTopic = stepRepository.save(masterTopic);
@@ -125,24 +145,24 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public MasterTopic editMasterTopicMentorApproval(String processId, String masterTopicName, MultipartFile file) throws IOException {
-        MasterTopic masterTopic = getMasterTopicFromProcess(processId, masterTopicName);
+    public MasterTopic editMasterTopicMentorApproval(String processId, MultipartFile file) throws IOException {
+        MasterTopic masterTopic = getMasterTopicFromProcess(processId);
         Document mentorApproval = documentService.saveApplicationDocument(new Student().getId(), file);
         masterTopic.setMentorApproval(mentorApproval);
         return stepRepository.save(masterTopic);
     }
 
     @Override
-    public MasterTopic editMasterTopicApplication(String processId, String masterTopicName, MultipartFile file) throws IOException {
-        MasterTopic masterTopic = getMasterTopicFromProcess(processId, masterTopicName);
+    public MasterTopic editMasterTopicApplication(String processId, MultipartFile file) throws IOException {
+        MasterTopic masterTopic = getMasterTopicFromProcess(processId);
         Document application = documentService.saveApplicationDocument(new Student().getId(), file);
         masterTopic.setApplication(application);
         return stepRepository.save(masterTopic);
     }
 
     @Override
-    public MasterTopic editMasterTopicSupplement(String processId, String masterTopicName, MultipartFile file) throws IOException {
-        MasterTopic masterTopic = getMasterTopicFromProcess(processId, masterTopicName);
+    public MasterTopic editMasterTopicSupplement(String processId, MultipartFile file) throws IOException {
+        MasterTopic masterTopic = getMasterTopicFromProcess(processId);
         Document supplement = documentService.saveApplicationDocument(new Student().getId(), file);
         masterTopic.setSupplement(supplement);
         return stepRepository.save(masterTopic);
@@ -154,28 +174,53 @@ public class StepServiceImpl implements StepService {
                 .orElseThrow(() -> new RuntimeException("There is not a attachment step with name " + name + " for process with id " + processId));
     }
 
+    private Document saveDocument(String personId, ProcessState processState, MultipartFile file) throws IOException {
+        if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState))
+            return documentService.saveDraft(personId, file);
+        return documentService.saveRepost(personId, file);
+    }
+
     @Override
-    public Attachment saveAttachment(String processId, String name, MultipartFile draft) throws IOException {
-        // TODO: check if this action can be done
-        Document draftDocument = documentService.saveApplicationDocument(new Student().getId(), draft);
+    public Attachment saveAttachment(String processId, ProcessState processState, String personId, MultipartFile draft) throws IOException {
+        Document draftDocument = saveDocument(personId, processState, draft);
         Attachment attachment = new Attachment(createNewStep(processId), draftDocument);
         attachment = stepRepository.save(attachment);
-        logger.info("Saved attachment for process: %s with name", processId);
+        logger.info("Saved attachment for process: {}", processId);
         return attachment;
     }
 
     @Override
-    public Attachment initializeAttachment(String processId) {
-        Attachment attachment = new Attachment(createNewStep(processId));
-        return stepRepository.save(attachment);
+    public Attachment initializeAttachment(String processId) throws IOException {
+//        Attachment attachment = new Attachment(createNewStep(processId));
+        Master master = processService.getProcessMaster(processId);
+        ProcessState processState = processService.getProcessState(processId);
+        String processStateName = processState.toString();
+        //ako nema ni eden napravi nov incace zemi od prethodniot
+        if(findAllSteps(processId).stream().noneMatch(s -> s.getName().equals(processStateName))) {
+            if(processState != STUDENT_CHANGES_DRAFT) {
+                Attachment attachment = new Attachment(createNewStep(processId));
+                return stepRepository.save(attachment);
+            }
+        }
+        String personId = "";
+        if(EnumSet.of(STUDENT_CHANGES_DRAFT, STUDENT_DRAFT).contains(processState)) {
+            processState = doesStepExist(processId, processState.toString()) ? processState : STUDENT_DRAFT;
+            personId = master.getStudent().getId();
+        }
+        else
+            personId = master.getMentor().getId();
+        // TODO: get files from previous attachment
+        Attachment attachment = getAttachmentFromProcess(processId, processState.toString());
+        MockMultipartFile file = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "app files".getBytes());
+        return saveAttachment(processId, processState, personId, file);
     }
 
     @Override
-    public Attachment editAttachment(String processId, String attachmentStepName, MultipartFile file) throws IOException {
+    public Attachment editAttachment(String processId, ProcessState processState, String personId, String attachmentStepName, MultipartFile file) throws IOException {
         Attachment attachment = getAttachmentFromProcess(processId, attachmentStepName);
-        Document document = documentService.saveApplicationDocument(new Student().getId(), file);
+        Document document = saveDocument(personId, processState, file);
         attachment.setDocument(document);
-        logger.info("Edited attachment for process: %s with name", processId);
+        logger.info("Edited attachment for process: {} with name", processId);
         attachment = stepRepository.save(attachment);
         return attachment;
     }
@@ -185,8 +230,7 @@ public class StepServiceImpl implements StepService {
         Step step = findStepById(stepId);
         step.setClosed(closedDateTime);
         step = stepRepository.save(step);
-        logger.info("Closed step with id: %s at %s", stepId, closedDateTime.toString());
+        logger.info("Closed step with id: {} at {}", stepId, closedDateTime.toString());
         return step;
-
     }
 }

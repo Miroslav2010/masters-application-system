@@ -18,7 +18,7 @@ import java.util.Date;
 @Repository
 public class FileRepositoryImplementation implements FileRepository {
     private FileSystemConfiguration fileSystemConfiguration;
-    private static String dataFolderName = "/MasterDocuments";
+    private static String dataFolderName = "";
     private static String applicationDocumentsFolderName = "/documents-application";
     private static String draftsFolderName = "/drafts";
     private static String reportsFolderName = "/reports";
@@ -30,9 +30,6 @@ public class FileRepositoryImplementation implements FileRepository {
     @PostConstruct
     public void init() {
         File folder = new File(fileSystemConfiguration.getDataDirectory() + dataFolderName);
-        if (fileSystemConfiguration.isRemoveData()) {
-            FileUtil.deleteContents(folder);
-        }
         folder.mkdirs();
     }
 

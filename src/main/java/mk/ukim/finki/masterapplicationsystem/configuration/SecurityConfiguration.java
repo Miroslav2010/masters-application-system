@@ -28,12 +28,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").permitAll()
                 .and()
                 .formLogin()
+                .permitAll()
                 .and()
                 .logout()
                 .permitAll();
-        httpSecurity.csrf().disable();
-        httpSecurity.headers().frameOptions().disable();
-        httpSecurity.cors();
+        httpSecurity.cors().and().csrf().disable();
+//        httpSecurity.headers().frameOptions().disable();
     }
 
     @Override

@@ -3,23 +3,20 @@ package mk.ukim.finki.masterapplicationsystem.web;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/master")
-@CrossOrigin()
 public class MasterController {
     private final MasterService masterService;
     private final MajorService majorService;
@@ -54,50 +51,9 @@ public class MasterController {
 
     @PostMapping("/master-topic")
     public MasterTopic createMasterTopic(@RequestBody MasterTopicStepDTO masterTopicStepDTO) throws IOException {
-        MultipartFile multipartFile = new MultipartFile() {
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getOriginalFilename() {
-                return null;
-            }
-
-            @Override
-            public String getContentType() {
-                return null;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public long getSize() {
-                return 0;
-            }
-
-            @Override
-            public byte[] getBytes() throws IOException {
-                return new byte[0];
-            }
-
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-
-            }
-        };
+        MockMultipartFile firstFile = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
         return masterManagementService.createMasterTopic(masterTopicStepDTO.getProcessId(), masterTopicStepDTO.getTopic(),
-                masterTopicStepDTO.getDescription(), multipartFile, multipartFile,
-                multipartFile, multipartFile);
+                masterTopicStepDTO.getDescription(), firstFile, firstFile, firstFile, firstFile);
     }
 
     @PostMapping("/validation-step")
@@ -112,12 +68,25 @@ public class MasterController {
 
     @PostMapping("/draft")
     public Attachment uploadDraft(@RequestBody DraftDTO draftDTO) throws IOException {
-        return masterManagementService.uploadDraft(draftDTO.getProcessId(), draftDTO.getDraft());
+        MockMultipartFile draft = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "some draft".getBytes());
+        return masterManagementService.uploadDraft(draftDTO.getProcessId(), draft);
     }
 
     @PostMapping("/confirm-draft")
-    public Process uploadDraft(@RequestParam String processId) {
+    public Process confirmUpload(@RequestParam String processId) {
         return masterManagementService.confirmUpload(processId);
+    }
+
+    @PostMapping("/cancel-revision")
+    public Process cancelTheRevisionLoop(@RequestParam String processId) {
+        return masterManagementService.cancelRevisionLoop(processId);
+    }
+
+    //------------------------------------------------------------------------------------------------------------------
+
+    @GetMapping("/{processId}/validation-details")
+    public ResponseEntity<ValidationResponseDTO> getValidationDetails(@PathVariable String processId) {
+        return ResponseEntity.ok(masterManagementService.getValidationDetails(processId));
     }
 
 }

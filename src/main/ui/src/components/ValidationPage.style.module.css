@@ -1,0 +1,39 @@
+.mainBox {
+    display: block;
+    transform: scale(0.9);
+    margin-top: 10px;
+    border: 2px solid grey;
+    border-radius: 5px;
+}
+
+.flex {
+    display: flex;
+}
+
+.flexColumnDirection {
+    flex-direction: column;
+}
+
+.hr {
+    border: 0;
+    height: 1px;
+    background-color: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+}
+
+.marginRight15 {
+    margin-right: 15px;
+}
+
+.alignItemsCenter {
+    align-items: center;
+}
+
+.commentMarginLeft {
+    margin-left: auto;
+}
+
+.spaceBetween {
+    justify-content: space-between;
+}
+

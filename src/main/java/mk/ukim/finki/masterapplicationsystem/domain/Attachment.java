@@ -15,12 +15,12 @@ public class Attachment extends Step {
     private Document document;
 
     public Attachment(Step step, Document document) {
-        super(step.getOrderNumber(), step.getName());
+        super(step.getOrderNumber(), step.getName(), step.getProcess());
         this.document = document;
     }
 
     public Attachment(Step step) {
-        super(step.getOrderNumber(), step.getName());
+        super(step);
     }
 
     public Attachment() {
