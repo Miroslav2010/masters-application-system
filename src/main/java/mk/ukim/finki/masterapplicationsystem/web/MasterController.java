@@ -6,6 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,11 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/master")
+@CrossOrigin()
 public class MasterController {
     private final MasterService masterService;
     private final MajorService majorService;
@@ -31,6 +34,11 @@ public class MasterController {
     @GetMapping("{id}")
     public Master findMasterById(@PathVariable String id) {
         return masterService.findMasterById(id);
+    }
+
+    @GetMapping("/major")
+    public ResponseEntity<List<Major>> getAllMajors(){
+        return ResponseEntity.ok(majorService.findAllMajors());
     }
 
     @PostMapping("/major")

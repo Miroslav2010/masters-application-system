@@ -27,10 +27,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
                 .and()
+                .formLogin()
+                .and()
                 .logout()
                 .permitAll();
         httpSecurity.csrf().disable();
         httpSecurity.headers().frameOptions().disable();
+        httpSecurity.cors();
     }
 
     @Override

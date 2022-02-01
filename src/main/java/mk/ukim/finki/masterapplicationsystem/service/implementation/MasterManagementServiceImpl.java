@@ -174,6 +174,4 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         setUpNewStep(processId);
         return process;
     }
-
-
 }

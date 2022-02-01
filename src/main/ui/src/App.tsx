@@ -4,6 +4,8 @@ import {Home} from "./Home";
 import {ThemeProvider} from "@mui/material";
 import {muiTheme} from "./Theme";
 import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import MasterTopic from "./components/master/MasterTopic";
 
 function App() {
     return (
@@ -12,6 +14,8 @@ function App() {
                 <Routes>
                     <Route path={"/"} element={<Home/>}/>
                     <Route path={"/login"} element={<Login/>}/>
+                    <Route path={"/register"} element={<Register/>}/>
+                    <Route path={"/masterTopic"} element={<MasterTopic/>}/>
                 </Routes>
             </Router>
         </ThemeProvider>

@@ -1,8 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.service;
 
-import mk.ukim.finki.masterapplicationsystem.domain.Attachment;
-import mk.ukim.finki.masterapplicationsystem.domain.Master;
-import mk.ukim.finki.masterapplicationsystem.domain.MasterTopic;
+import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,5 +22,4 @@ public interface MasterManagementService {
     Attachment uploadDraft(String processId, MultipartFile draft) throws IOException;
 
     Process confirmUpload(String processId);
-
 }
