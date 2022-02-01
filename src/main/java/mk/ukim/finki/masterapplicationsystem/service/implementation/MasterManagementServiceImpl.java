@@ -238,15 +238,16 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Override
     public ValidationResponseDTO getValidationDetails(String processId) {
 //        Person loggedInUser = personService.getLoggedInUser();
-        permissionService.canPersonValidateMaster(processId, "b15a901f-5c68-4f97-ba63-28180aa927fa");
+//        permissionService.canPersonValidateMaster(processId, "b15a901f-5c68-4f97-ba63-28180aa927fa");
         ProcessState state = processService.getProcessState(processId);
         Master master = processService.getProcessMaster(processId);
-//        List<String> documentLocations = getDocumentLocations(processId);
-        return new ValidationResponseDTO(state.label, master.getStudent().getFullName(), Arrays.asList("download-url.com", "download1-url.com", "download2-url.com", "download3-url.com"));
+        List<String> documentLocations = getDocumentLocations(processId);
+        return new ValidationResponseDTO(state.label, master.getStudent().getFullName(), documentLocations);
     }
 
     private List<String> getDocumentLocations(String processId) {
-        ProcessState processState = processService.getProcessState(processId);
+//        ProcessState processState = processService.getProcessState(processId);
+        ProcessState processState = DOCUMENT_APPLICATION;
         ProcessState draftState = firstStepFromPhase(processState);
         List<String> documentLocations = new ArrayList<>();
         if (draftState == DOCUMENT_APPLICATION) {

@@ -100,11 +100,11 @@ class ValidationPage extends React.Component<Props, State> {
                                 </span>
                             </Typography>
                             <hr className={styles.hr}/>
-                            <Typography variant="body2" color="text.secondary" sx={{fontSize: 18, marginTop: '30px', display: 'flex'}}>
+                            <Typography variant="body2" color="text.secondary" sx={{fontSize: 18, marginTop: '30px', display: 'flex', wordBreak: 'break-all'}}>
                                 {this.state.downloadFileUrls.map((value, index) => (
                                     <span key={index} className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {value}
-                                        <IconButton sx={{ marginLeft: '5px' }}>
+                                        <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}>
                                             <DownloadForOfflineRoundedIcon fontSize='large'/>
                                         </IconButton>
                                     </span>

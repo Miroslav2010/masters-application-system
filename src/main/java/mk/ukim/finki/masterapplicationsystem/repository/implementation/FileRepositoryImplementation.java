@@ -30,9 +30,6 @@ public class FileRepositoryImplementation implements FileRepository {
     @PostConstruct
     public void init() {
         File folder = new File(fileSystemConfiguration.getDataDirectory() + dataFolderName);
-        if (fileSystemConfiguration.isRemoveData()) {
-            FileUtil.deleteContents(folder);
-        }
         folder.mkdirs();
     }
 
