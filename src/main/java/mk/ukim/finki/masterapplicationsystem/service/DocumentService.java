@@ -9,9 +9,14 @@ import java.io.IOException;
 
 public interface DocumentService {
     Document saveApplicationDocument(String userId, MultipartFile file) throws IOException;
+
     Document saveDraft(String userId, MultipartFile file) throws IOException;
+
     Document saveRepost(String userId, MultipartFile file) throws IOException;
+
     Document findDocumentById(String id);
-    Resource findFileByDocumentId(String  id) throws FileNotFoundException;
+
+    Resource findFileByDocumentId(String id) throws FileNotFoundException;
+
     Resource findFileByLocation(String location) throws FileNotFoundException;
 }

@@ -14,6 +14,8 @@ public interface ProcessService {
 
     ProcessState getProcessState(String id);
 
+    Process setState(Process process, int processStateId);
+
     Process nextState(String id);
 
     Process goToStep(String id, ProcessState state);

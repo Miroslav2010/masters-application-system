@@ -1,17 +1,20 @@
 package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
+import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.domain.StepValidation;
 import mk.ukim.finki.masterapplicationsystem.domain.Validation;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import mk.ukim.finki.masterapplicationsystem.repository.StepValidationRepository;
-import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role.*;
 
 @Service
 public class StepValidationServiceImpl implements StepValidationService {
@@ -25,7 +28,14 @@ public class StepValidationServiceImpl implements StepValidationService {
 
     @Override
     public StepValidation findById(String id) {
-        return stepValidationRepository.findById(id).orElseThrow(() -> new RuntimeException("Step validation with id " + id + " was not found"));
+        return stepValidationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException(String.format("Step validation with id %s was not found", id)));
+    }
+
+    @Override
+    public StepValidation findByStepIdAndPersonId(String stepId, String personId) {
+        return stepValidationRepository.findByValidationIdAndPersonId(stepId, personId)
+                .orElseThrow(() -> new RuntimeException(String.format("Step validation with step id %s and person id %s was not found", stepId, personId)));
     }
 
     @Override
@@ -41,8 +51,13 @@ public class StepValidationServiceImpl implements StepValidationService {
     }
 
     @Override
-    public StepValidation changeStepValidationStatus(String stepValidationId, ValidationStatus validationStatus) {
-        StepValidation stepValidation = findById(stepValidationId);
+    public StepValidation changeStepValidationStatus(Step validationStep, Person person, ValidationStatus validationStatus) {
+        List<Role> roles = person.getRoles();
+        StepValidation stepValidation;
+        if(roles.contains(STUDENT_SERVICE) || roles.contains(SECRETARY) || roles.contains(NNK))
+            stepValidation = createStepValidation((Validation) validationStep, person);
+        else
+            stepValidation = findByStepIdAndPersonId(validationStep.getId(), person.getId());
         stepValidation.setValidationStatus(validationStatus);
         return stepValidationRepository.save(stepValidation);
     }

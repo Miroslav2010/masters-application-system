@@ -18,6 +18,8 @@ public interface PermissionService {
 
     void canPersonValidateMaster(String processId, String personId);
 
+    void canPersonCancelRevisionLoop(String processId, String personId);
+
     void canPersonUploadAttachment(String processId, String personId);
 
     void canPersonWriteRemark(String processId, String personId);

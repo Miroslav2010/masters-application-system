@@ -12,7 +12,7 @@ public interface StepRepository extends JpaRepository<Step, String> {
 
     Optional<Step> findByProcessIdAndName(String processId, String stepName);
 
-    Optional<Step> findByProcessIdAndNameOrderByOrderNumberDesc(String processId, String stepName);
+    Optional<Step> findFirstByProcessIdAndNameOrderByOrderNumberDesc(String processId, String stepName);
 
     List<Step> findAllByProcessIdAndName(String processId, String stepName);
 }
