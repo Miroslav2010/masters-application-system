@@ -35,4 +35,17 @@ public class ProcessStateHelperService {
         }
         return responsiblePersons;
     }
+
+    public String getTypeOfStep(ProcessState processState) {
+        if (processState == DOCUMENT_APPLICATION)
+            return "MasterTopic";
+        else if (EnumSet.of(INITIAL_MENTOR_REVIEW, STUDENT_SERVICE_REVIEW, INITIAL_NNK_REVIEW, INITIAL_SECRETARY_REVIEW,
+                DRAFT_MENTOR_REVIEW, DRAFT_SECRETARY_REVIEW, DRAFT_NNK_REVIEW, SECOND_DRAFT_SECRETARY_REVIEW, DRAFT_COMMITTEE_REVIEW,
+                REPORT_REVIEW, REPORT_SECRETARY_REVIEW, REPORT_STUDENT_SERVICE).contains(processState))
+            return "Validation";
+        else if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT, MENTOR_REPORT).contains(processState))
+            return "Attachment";
+        else
+            return "Finished";
+    }
 }

@@ -7,22 +7,22 @@ import {RemarkDTO} from "../domain/remarkResponse";
 
 interface Props {
     remarks: RemarkDTO[],
-    editRemark: Function,
-    deleteRemark: Function
+    editRemark?: Function,
+    deleteRemark?: Function
 }
 
 const RemarkList = (props: Props) => {
     return (
-    <List sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+    <List sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '30px' }}>
         {props.remarks.map((value, index) => (
             <ListItem key={index}  sx={{ border: '1px solid grey', borderRadius: '5px', width: '90%', display: 'block', marginBottom: '20px'}}
                       secondaryAction={
-                          value.personName === 'Mentor' &&
+                          value.personName === 'Mentor' && props.editRemark != undefined && props.deleteRemark != undefined &&
                           <Stack>
-                              <IconButton onClick={() => props.editRemark(index)}>
+                              <IconButton onClick={() => props.editRemark != undefined ? props.editRemark(index) : ""}>
                                   <EditIcon />
                               </IconButton>
-                              <IconButton onClick={() => props.deleteRemark(value.remarkId)}>
+                              <IconButton onClick={() => props.deleteRemark != undefined ? props.deleteRemark(index) : ""}>
                                   <DeleteIcon />
                               </IconButton>
                           </Stack>

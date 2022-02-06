@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProcessServiceImpl implements ProcessService {
     private final Logger logger = LoggerFactory.getLogger(ProcessServiceImpl.class);
@@ -16,6 +18,11 @@ public class ProcessServiceImpl implements ProcessService {
 
     public ProcessServiceImpl(ProcessRepository processRepository) {
         this.processRepository = processRepository;
+    }
+
+    @Override
+    public List<Process> findAll() {
+        return processRepository.findAll();
     }
 
     @Override

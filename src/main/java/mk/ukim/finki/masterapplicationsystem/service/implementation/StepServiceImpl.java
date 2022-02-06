@@ -16,9 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.*;
 
@@ -50,6 +49,20 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
+    public List<Step> findAllLastInstanceSteps(String processId) {
+        List<Step> steps = new ArrayList<>();
+        Arrays.stream(values()).forEach(s -> steps.addAll(stepRepository.findAllByProcessIdAndName(processId, s.toString())));
+        return steps.stream().sorted(Comparator.comparing(Step::getOrderNumber)).collect(Collectors.toList());
+    }
+
+    @Override
+    public Step findHistoryStepById(String stepId) {
+        Step step = findStepById(stepId);
+        step.setProcess(null);
+        return step;
+    }
+
+    @Override
     public Step findStepById(String id) {
         return stepRepository.findById(id).orElseThrow(() -> new RuntimeException("Step with id " + id + " was not found"));
     }
@@ -60,7 +73,8 @@ public class StepServiceImpl implements StepService {
                 .orElseThrow(() -> new RuntimeException(String.format("Step of the processId %s was not found", processId)));
     }
 
-    private boolean doesStepExist(String processId, String name) {
+    @Override
+    public boolean doesStepExist(String processId, String name) {
         return stepRepository.findFirstByProcessIdAndNameOrderByOrderNumberDesc(processId, name).isPresent();
     }
 
@@ -109,29 +123,27 @@ public class StepServiceImpl implements StepService {
 
     @Override
     public MasterTopic saveMasterTopic(String processId, String userId, String topic, String description,
-                                       MultipartFile biography, MultipartFile mentorApproval, MultipartFile application,
-                                       MultipartFile supplement) throws IOException {
+                                       Document biography, Document mentorApproval, Document application,
+                                       Document supplement) throws IOException {
         // we create master topic for every DOCUMENT_APPLICATION step
-        if(stepRepository.findAllByProcessIdAndName(processId, DOCUMENT_APPLICATION.toString()).size() > 0) {
-            Document biographyDocument = documentService.saveApplicationDocument(userId, biography);
-            Document mentorApprovalDocument = documentService.saveApplicationDocument(userId, mentorApproval);
-            Document applicationDocument = documentService.saveApplicationDocument(userId, application);
-            Document supplementDocument = documentService.saveApplicationDocument(userId, supplement);
-            MasterTopic lastMasterTopic = getMasterTopicFromProcess(processId);
-            lastMasterTopic.setBiography(biographyDocument);
-            lastMasterTopic.setMentorApproval(mentorApprovalDocument);
-            lastMasterTopic.setApplication(applicationDocument);
-            lastMasterTopic.setSupplement(supplementDocument);
-            return stepRepository.save(lastMasterTopic);
-        }
+        MasterTopic masterTopic = new MasterTopic(createNewStep(processId), topic, description, application,
+                mentorApproval, biography, supplement);
+        logger.info("Saved topic for master with process id: {}", processId);
+        return stepRepository.save(masterTopic);
+    }
+
+    @Override
+    public MasterTopic editMasterTopic(String processId, String userId, String topic, String description, MultipartFile application, MultipartFile mentorApproval, MultipartFile biography, MultipartFile supplement) throws IOException {
         Document biographyDocument = documentService.saveApplicationDocument(userId, biography);
         Document mentorApprovalDocument = documentService.saveApplicationDocument(userId, mentorApproval);
         Document applicationDocument = documentService.saveApplicationDocument(userId, application);
         Document supplementDocument = documentService.saveApplicationDocument(userId, supplement);
-        MasterTopic masterTopic = new MasterTopic(createNewStep(processId), topic, description, applicationDocument,
-                mentorApprovalDocument, biographyDocument, supplementDocument);
-        logger.info("Saved topic for master with process id: %s", processId);
-        return stepRepository.save(masterTopic);
+        MasterTopic lastMasterTopic = getMasterTopicFromProcess(processId);
+        lastMasterTopic.setBiography(biographyDocument);
+        lastMasterTopic.setMentorApproval(mentorApprovalDocument);
+        lastMasterTopic.setApplication(applicationDocument);
+        lastMasterTopic.setSupplement(supplementDocument);
+        return stepRepository.save(lastMasterTopic);
     }
 
     @Override

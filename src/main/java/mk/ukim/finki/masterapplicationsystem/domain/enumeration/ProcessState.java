@@ -18,7 +18,7 @@ public enum ProcessState {
     MENTOR_REPORT("Ментор затвора циклус на поправки и прикачува извештај"),
     REPORT_REVIEW("Валидирање на извештај"),
     REPORT_SECRETARY_REVIEW("Секретар валидира извештај"),
-    REPORT_STUDENT_SERVICE("Студентса служба валидира извештај"),
+    REPORT_STUDENT_SERVICE("Студентска служба валидира извештај"),
     APPLICATION_FINISHED("Процесот на апликација е завршен. Се чека одбрана на магистерската"),
     FINISHED("Одбранета магистерска");
 

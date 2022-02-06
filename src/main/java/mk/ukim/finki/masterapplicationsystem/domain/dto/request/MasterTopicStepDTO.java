@@ -5,8 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 public class MasterTopicStepDTO {
-
-    private String processId;
     private String topic;
     private String description;
     private MultipartFile biography;

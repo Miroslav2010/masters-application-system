@@ -2,32 +2,14 @@ import React from "react";
 import {useParams} from 'react-router-dom';
 import {PageLayout} from "../PageLayout";
 import ValidationService from "../service/validationService";
-import {
-    Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    List,
-    ListItem,
-    ListItemText,
-    Stack,
-    Typography
-} from "@mui/material";
+import {Box, Button, Card, CardActions, CardContent, Typography} from "@mui/material";
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import DownloadForOfflineRoundedIcon from '@mui/icons-material/DownloadForOfflineRounded';
 import IconButton from '@mui/material/IconButton';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import RemarkDialog from "../dialog/RemarkDialog";
 import RemarkList from "./RemarkList";
 import RemarkService from "../service/remarkService";
 import {RemarkDTO} from "../domain/remarkResponse";
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import styles from './ValidationPage.style.module.css'
 
 interface Props {
@@ -44,6 +26,7 @@ interface State {
     remark: string;
     defaultRemark: string;
     remarks: RemarkDTO[];
+    editRemarkId: string | undefined;
 }
 
 class ValidationPage extends React.Component<Props, State> {
@@ -60,7 +43,8 @@ class ValidationPage extends React.Component<Props, State> {
             open: false,
             remark: "",
             defaultRemark: "",
-            remarks: []
+            remarks: [],
+            editRemarkId: undefined
         }
     }
 
@@ -81,9 +65,9 @@ class ValidationPage extends React.Component<Props, State> {
 
     render() {
         return (
-            <PageLayout>
+            // <PageLayout>
                 <Box component="div" sx={{display: 'block', transform: 'scale(0.9)', marginTop: '10px', border: '2px solid grey', borderRadius: '5px'}}>
-                    <Card variant="outlined" sx={{minHeight: '25vw'}} className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
+                    <Card variant="outlined" sx={{minHeight: '65vh'}} className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
                         <CardContent>
                             <Typography gutterBottom variant="h5" component="div" color="text.secondary">
                                 {this.state.stepName}
@@ -104,7 +88,7 @@ class ValidationPage extends React.Component<Props, State> {
                                 {this.state.downloadFileUrls.map((value, index) => (
                                     <span key={index} className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {value}
-                                        <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}>
+                                        <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + value} >
                                             <DownloadForOfflineRoundedIcon fontSize='large'/>
                                         </IconButton>
                                     </span>
@@ -189,39 +173,31 @@ class ValidationPage extends React.Component<Props, State> {
             {/*    </DialogActions>*/}
             {/*</Dialog>*/}
                 </Box>
-                <form method="post" action="http://localhost:8080/login">
-                    <p>
-                        <label htmlFor="username" >Username</label>
-                        <input type="text" id="username" name="username"
-                              />
-                    </p>
-                    <p>
-                        <label htmlFor="password" >Password</label>
-                        <input type="password" id="password" name="password"
-                              />
-                    </p>
-                    <button type="submit">Sign in</button>
-                </form>
-            </PageLayout>
         )
     }
 
     private handleDialogClose = (save: boolean) => {
         console.log(save);
         if (save) {
-            RemarkService.addRemark(this.state.processId, this.state.remark)
+            RemarkService.addRemark(this.state.processId, this.state.remark, this.state.editRemarkId)
                 .then(() => this.getAllRemarks(this.state.processId));
         }
         // console.log(this.state.remark);
         this.setState({
             open: false,
-            remark: ""
+            remark: "",
+            editRemarkId: undefined
         })
     }
 
     private login() {
         ValidationService.login();
     }
+
+    // private downloadFile(fileUrl: string) {
+    //     DocumentService.downloadFile(fileUrl)
+    //         .then(blob => saveAs(blob, 'foaf'));
+    // }
 
     private getAllRemarks(processId: string | undefined) {
         RemarkService.getRemarks(processId).then(remarks => {
@@ -237,7 +213,8 @@ class ValidationPage extends React.Component<Props, State> {
         this.setState({
             defaultRemark: this.state.remarks[index].remark,
             open: true,
-            remark: this.state.remarks[index].remark
+            remark: this.state.remarks[index].remark,
+            editRemarkId: this.state.remarks[index].remarkId
         })
     }
 

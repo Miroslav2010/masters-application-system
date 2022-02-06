@@ -3,6 +3,8 @@ package mk.ukim.finki.masterapplicationsystem.web;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.StepPreviewDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
@@ -10,6 +12,7 @@ import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,11 +52,14 @@ public class MasterController {
                 masterCreateDTO.getSecondCommitteeId(), masterCreateDTO.getMajorId());
     }
 
-    @PostMapping("/master-topic")
-    public MasterTopic createMasterTopic(@RequestBody MasterTopicStepDTO masterTopicStepDTO) throws IOException {
+    @PostMapping(value = "/master-topic/{processId}")
+    public MasterTopic createMasterTopic(@PathVariable String processId, @RequestParam String topic, @RequestParam String description,
+                                         @RequestParam MultipartFile biography, @RequestParam MultipartFile mentorApproval, @RequestParam MultipartFile application,
+                                         @RequestParam MultipartFile supplement) throws IOException {
         MockMultipartFile firstFile = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
-        return masterManagementService.createMasterTopic(masterTopicStepDTO.getProcessId(), masterTopicStepDTO.getTopic(),
-                masterTopicStepDTO.getDescription(), firstFile, firstFile, firstFile, firstFile);
+        return masterManagementService.createMasterTopic(processId, topic,
+                description, biography, mentorApproval,
+                application, supplement);
     }
 
     @PostMapping("/validation-step")
@@ -87,6 +93,21 @@ public class MasterController {
     @GetMapping("/{processId}/validation-details")
     public ResponseEntity<ValidationResponseDTO> getValidationDetails(@PathVariable String processId) {
         return ResponseEntity.ok(masterManagementService.getValidationDetails(processId));
+    }
+
+    @GetMapping("/all")
+    public List<MasterPreviewDTO> getAllMasters() {
+        return masterManagementService.getAllMasters();
+    }
+
+    @GetMapping("/{processId}/all-steps")
+    public List<StepPreviewDTO> getSteps(@PathVariable String processId) {
+        return masterManagementService.getAllFinishedSteps(processId);
+    }
+
+    @GetMapping("/{processId}/student")
+    public Student getStudent(@PathVariable String processId) {
+        return masterManagementService.getStudent(processId);
     }
 
 }

@@ -2,17 +2,20 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.StepPreviewDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import mk.ukim.finki.masterapplicationsystem.service.*;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -30,9 +33,11 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     private final StepValidationService stepValidationService;
     private final PermissionService permissionService;
     private final DocumentService documentService;
+    private final ProcessStateHelperService processStateHelperService;
 
     public MasterManagementServiceImpl(MasterService masterService, ProcessService processService, StepService stepService,
-                                       PersonService personService, MajorService majorService, StepValidationService stepValidationService, ProcessStateHelperService processStateHelperService, PermissionService permissionService, DocumentService documentService) {
+                                       PersonService personService, MajorService majorService, StepValidationService stepValidationService,
+                                       PermissionService permissionService, DocumentService documentService, ProcessStateHelperService processStateHelperService) {
         this.masterService = masterService;
         this.processService = processService;
         this.stepService = stepService;
@@ -41,6 +46,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         this.stepValidationService = stepValidationService;
         this.permissionService = permissionService;
         this.documentService = documentService;
+        this.processStateHelperService = processStateHelperService;
     }
 
     private Professor findProfessorById(String id) {
@@ -82,12 +88,17 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     private void setUpNewMasterTopic(String processId) throws IOException {
-        MasterTopic masterTopic = stepService.getMasterTopicFromProcess(processId);
+        MasterTopic masterTopic = null;
+        if(stepService.doesStepExist(processId, DOCUMENT_APPLICATION.toString()))
+            masterTopic = stepService.getMasterTopicFromProcess(processId);
         Master master = processService.getProcessMaster(processId);
         // TODO: get files from previous master topic
-        MockMultipartFile file = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "app files".getBytes());
-        MasterTopic newMasterTopic = stepService.saveMasterTopic(processId, master.getStudent().getId(), masterTopic.getTopic(),
-                masterTopic.getDescription(), file, file, file, file);
+//        MockMultipartFile file = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "app files".getBytes());
+        Document document = null;
+        if(masterTopic == null)
+            stepService.saveMasterTopic(processId, master.getStudent().getId(), "", "", null, null, null, null);
+        else stepService.saveMasterTopic(processId, master.getStudent().getId(), masterTopic.getTopic(),
+                masterTopic.getDescription(), document, document, document, document);
     }
 
 //    it's best to create remark when someone leave remark
@@ -121,7 +132,9 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         Major major = majorService.findMajorById(majorId);
         Master master = masterService.saveMasterWithAllData(student, mentor, firstCommittee, secondCommittee, major);
         Process masterProcess = processService.save(master);
-        return processNextState(masterProcess.getId());
+        Process process = processNextState(masterProcess.getId());
+        setUpNewStep(process.getId());
+        return process;
     }
 
     @Transactional
@@ -130,7 +143,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
                                          MultipartFile mentorApproval, MultipartFile application, MultipartFile supplement) throws IOException {
         Person loggedInUser = personService.getLoggedInUser();
         permissionService.canPersonCreateMasterTopic(processId, loggedInUser.getId());
-        MasterTopic masterTopic = stepService.saveMasterTopic(processId, loggedInUser.getId(), topic, description,
+        MasterTopic masterTopic = stepService.editMasterTopic(processId, loggedInUser.getId(), topic, description,
                 application, mentorApproval, biography, supplement);
         processNextState(processId);
         setUpNewStep(processId);
@@ -242,6 +255,35 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         Master master = processService.getProcessMaster(processId);
         List<String> documentLocations = getDocumentLocations(processId);
         return new ValidationResponseDTO(state.label, master.getStudent().getFullName(), documentLocations);
+    }
+
+    private MasterPreviewDTO getMasterDetails(Process process) {
+        Master master = process.getMaster();
+        String state = process.getProcessState().label;
+        return new MasterPreviewDTO(process.getId(), master.getStudent().getFullName(), master.getMentor().getFullName(),
+                state, OffsetDateTime.now().format(DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm")));
+    }
+
+    @Override
+    public List<MasterPreviewDTO> getAllMasters() {
+        List<Process> processes = processService.findAll();
+        List<MasterPreviewDTO> masters = new ArrayList<>();
+        processes.forEach(s -> masters.add(getMasterDetails(s)));
+        return masters;
+    }
+
+    @Override
+    public List<StepPreviewDTO> getAllFinishedSteps(String processId) {
+        ProcessState processState = processService.getProcessState(processId);
+        String typeOfStep = processStateHelperService.getTypeOfStep(processState);
+        List<StepPreviewDTO> steps = new ArrayList<>();
+        stepService.findAllLastInstanceSteps(processId).forEach(s -> steps.add(new StepPreviewDTO(s.getId(), s.getName(), typeOfStep)));
+        return steps;
+    }
+
+    @Override
+    public Student getStudent(String processId) {
+        return processService.getProcessMaster(processId).getStudent();
     }
 
     private List<String> getDocumentLocations(String processId) {
