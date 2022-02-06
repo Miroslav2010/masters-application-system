@@ -1,10 +1,15 @@
 package mk.ukim.finki.masterapplicationsystem.web;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.LoginDto;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.PersonDto;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -12,14 +17,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/person")
-@CrossOrigin()
+@CrossOrigin(value = "http://localhost:3000")
 public class PersonController {
 
     private final PersonService personService;
 
+    private final AuthenticationManager authenticationManager;
 
-    public PersonController(PersonService personService) {
+
+    public PersonController(PersonService personService, AuthenticationManager authenticationManager) {
         this.personService = personService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping
@@ -55,5 +63,14 @@ public class PersonController {
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> getAllRoles() {
         return ResponseEntity.ok(Arrays.asList(Role.values()));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity login(@RequestBody LoginDto loginDto){
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                loginDto.getFullName(), loginDto.getPassword()));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return ResponseEntity.ok().build();
     }
 }
