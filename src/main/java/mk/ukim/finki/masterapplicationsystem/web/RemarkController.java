@@ -1,7 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.web;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
-import mk.ukim.finki.masterapplicationsystem.domain.Remark;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.request.RemarkRequestDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.RemarkResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
@@ -11,9 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.DRAFT_MENTOR_REVIEW;
-import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState.INITIAL_MENTOR_REVIEW;
 
 @CrossOrigin
 @RestController
@@ -42,6 +38,16 @@ public class RemarkController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{processId}/edit")
+    public ResponseEntity editRemark(@PathVariable String processId, @RequestBody RemarkRequestDTO remark) {
+        //TODO: get current person
+        //TODO: Rollback
+        Person person = personService.getPerson("b15a901f-5c68-4f97-ba63-28180aa927fa");
+//        RemarkDto remarkDto = new RemarkDto(remark, person);
+        remarkService.saveRemark(processId, person, remark.getRemark());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{remarkId}")
     public void deleteRemark(@PathVariable String remarkId) {
         remarkService.deleteById(remarkId);
@@ -53,10 +59,14 @@ public class RemarkController {
 //                "asfijasiofjaoijsfiasfjoiasjfijsfoijasofijasiojd as i djaisoj fiajs ijfasioj fisaj ijfjsjj.");
 //        RemarkResponseDTO responseDTO1 = new RemarkResponseDTO("Second Proffessor", "I awsa dasdiasjd ijasidjasjfoiasjfoj saojfosa j" +
 //                "asfijasiofjaoijsfiasfjoiasjfijsfoijasofijasiojdjsjj.");
-        List<Remark> remarks = remarkService.findAllByStepName(processId, DRAFT_MENTOR_REVIEW.toString());
-        List<RemarkResponseDTO> remarkResponseDTOS = new ArrayList<>();
-        remarks.forEach(s -> remarkResponseDTOS.add(new RemarkResponseDTO(s.getId(), s.getPerson().getFullName(), s.getRemark())));
-        return remarkResponseDTOS;
+        return remarkService.findAllRemarksForCurrentStep(processId);
+    }
+
+    @GetMapping("/step/{stepId}")
+    public List<RemarkResponseDTO> getAllRemarksForStep(@PathVariable String stepId) {
+        List<RemarkResponseDTO> remarks = new ArrayList<>();
+        remarkService.findAllByStepId(stepId).forEach(s -> remarks.add(new RemarkResponseDTO(s.getId(), s.getPerson().getFullName(), s.getRemark())));
+        return remarks;
     }
 
 }

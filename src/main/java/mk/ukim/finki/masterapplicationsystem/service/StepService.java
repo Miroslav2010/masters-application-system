@@ -1,9 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.service;
 
-import mk.ukim.finki.masterapplicationsystem.domain.Attachment;
-import mk.ukim.finki.masterapplicationsystem.domain.MasterTopic;
-import mk.ukim.finki.masterapplicationsystem.domain.Step;
-import mk.ukim.finki.masterapplicationsystem.domain.Validation;
+import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +12,12 @@ import java.util.Optional;
 public interface StepService {
 
     List<Step> findAllSteps(String processId);
+
+    List<Step> findAllLastInstanceSteps(String processId);
+
+    boolean doesStepExist(String processId, String name);
+
+    Step findHistoryStepById(String stepId);
 
     Step findStepById(String id);
 
@@ -29,6 +32,9 @@ public interface StepService {
     MasterTopic getMasterTopicFromProcess(String processId);
 
     MasterTopic saveMasterTopic(String processId, String userId, String topic, String description,
+                                Document application, Document mentorApproval, Document biography, Document supplement) throws IOException;
+
+    MasterTopic editMasterTopic(String processId, String userId, String topic, String description,
                                 MultipartFile application, MultipartFile mentorApproval, MultipartFile biography, MultipartFile supplement) throws IOException;
 
     MasterTopic editMasterTopicBiography(String processId, MultipartFile file) throws IOException;
