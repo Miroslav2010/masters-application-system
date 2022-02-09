@@ -24,7 +24,6 @@ const Authentication = () => {
     }
 
     let userString = localStorage.getItem("user")
-    console.log(userString)
     if (userString != null) {
         try {
             let user: User = JSON.parse(userString)

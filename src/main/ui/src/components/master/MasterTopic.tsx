@@ -20,10 +20,11 @@ import {PersonDto} from "../../domain/PersonDto";
 import {MajorDto} from "../../domain/MajorDto";
 import masterService from "../../service/masterService";
 import styles from "../ValidationPage.style.module.css";
-import Divider from "@mui/material/Divider";
 import {PageLayout} from "../../PageLayout";
+import {NavigateFunction, useNavigate} from "react-router-dom";
 
 interface IProps {
+    navigation: NavigateFunction
 }
 
 interface IState {
@@ -47,6 +48,7 @@ class MasterTopic extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
+        console.log(props);
         this.state = {
             professors: [],
             majors: [],
@@ -112,10 +114,16 @@ class MasterTopic extends React.Component<IProps, IState> {
             mentorId: this.state.mentorId,
             firstCommitteeId: this.state.firstCommittee,
             secondCommitteeId: this.state.secondCommittee
-        })
+        }).then(res => this.props.navigation("/masters"));
+    }
+
+    updateIsDisabled() {
+        return this.state.majorId == "" || this.state.mentorId == "" || this.state.firstCommittee == "" ||
+            this.state.secondCommittee == "";
     }
 
     render() {
+
         return (
             <PageLayout>
                 <Box component="div" sx={{
@@ -140,17 +148,33 @@ class MasterTopic extends React.Component<IProps, IState> {
                                     justifyContent="flex-start"
                                     alignItems="center"
                                     xs={12}>
-                                    <Typography gutterBottom variant="h5" component="div" color="text.secondary">
+                                    <Typography gutterBottom variant="h5" component="div" color="text.secondary" sx={{fontSize: '35px'}}>
                                         Пријава
                                     </Typography>
                                 </Grid>
-                                <Divider/>
+                                <Grid
+                                    item
+                                    justifyContent="flex-start"
+                                    alignItems="center"
+                                    xs={12}>
+                                    <hr className={styles.hr}/>
+                                </Grid>
+                                <Grid
+                                    item
+                                    justifyContent="flex-start"
+                                    alignItems="center"
+                                    xs={12}>
+                                    <Typography gutterBottom variant="h5" component="div" color="text.secondary">
+                                        Потребно е да се избере ментор, насока и членови на комисија
+                                    </Typography>
+                                </Grid>
                                 <Grid
                                     item
                                     container
                                     direction="row"
                                     justifyContent="center"
                                     alignItems="center"
+                                    sx={{ marginTop: '30px'}}
                                     xs={6}>
                                     <FormControl sx={{m: 1, width: 200}}>
                                         <InputLabel id="majorLabel">Насока</InputLabel>
@@ -257,7 +281,7 @@ class MasterTopic extends React.Component<IProps, IState> {
                                 container
                                 xs={12}
                                 justifyContent="flex-end">
-                                <Button variant="contained" color="success" onClick={() => {
+                                <Button variant="contained" color="success" disabled={this.updateIsDisabled()} onClick={() => {
                                     this.handleSubmit()
                                 }}>Потврди</Button>
                             </Grid>
@@ -269,4 +293,9 @@ class MasterTopic extends React.Component<IProps, IState> {
     }
 }
 
-export default MasterTopic
+export default function(props: any) {
+    // const navigation = useNavigate();
+
+    return <MasterTopic
+        {...props} navigation={useNavigate()}/>
+}

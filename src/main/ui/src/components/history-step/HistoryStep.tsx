@@ -10,6 +10,7 @@ import {StepValidationDto} from "../../domain/StepValidationDto";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
+import masterService from "../../service/masterService";
 
 interface Props {
     historyStep: StepHistoryDto,
@@ -18,12 +19,26 @@ interface Props {
 }
 
 const HistoryStep = (props: Props) => {
+
+    const translateLabel = (label: string) => {
+        if (label == "APPROVED")
+            return "ОДОБРЕНО";
+        if (label == "REFUSED")
+            return "ОДБИЕНО";
+        if (label == "WAITING")
+            return "СЕ ЧЕКА";
+    }
+
+    const translateStepName = (name: string) => {
+        return masterService.translate(name);
+    }
+
     return (
         <Box component="div" sx={{display: 'block', transform: 'scale(0.9)', marginTop: '10px', border: '2px solid grey', borderRadius: '5px'}}>
             <Card variant="outlined" sx={{minHeight: '65vh', minWidth: '70vw'}} className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div" color="text.secondary">
-                        {props.historyStep?.name}
+                        {translateStepName(props.historyStep?.name)}
                     </Typography>
                     <hr className={styles.hr}/>
                     {props.historyStep?.topic != null ?
@@ -44,7 +59,7 @@ const HistoryStep = (props: Props) => {
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.application.location}
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.application.location} >
-                                            <DownloadForOfflineRoundedIcon fontSize='large'/>
+                                            <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
@@ -52,7 +67,7 @@ const HistoryStep = (props: Props) => {
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.biography.location}
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.biography.location} >
-                                            <DownloadForOfflineRoundedIcon fontSize='large'/>
+                                            <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
@@ -60,7 +75,7 @@ const HistoryStep = (props: Props) => {
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.mentorApproval.location}
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.mentorApproval.location} >
-                                            <DownloadForOfflineRoundedIcon fontSize='large'/>
+                                            <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
@@ -68,7 +83,7 @@ const HistoryStep = (props: Props) => {
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.supplement.location}
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.supplement.location} >
-                                            <DownloadForOfflineRoundedIcon fontSize='large'/>
+                                            <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
@@ -76,7 +91,7 @@ const HistoryStep = (props: Props) => {
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.document.location}
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.document.location} >
-                                            <DownloadForOfflineRoundedIcon fontSize='large'/>
+                                            <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
@@ -89,13 +104,18 @@ const HistoryStep = (props: Props) => {
                     {props.validations.map((value, index) => (
                         <Typography key={value.id} variant="body2" color="text.secondary"
                                     sx={{fontSize: 23, marginLeft: '80px', display: 'flex', alignItems: 'center'}}>
-                            {value.person} - {value.status}
-                            {value.status == "APPROVED" ? <CheckCircleIcon fontSize='large' sx={{marginLeft: '15px'}}/>
-                            : (value.status == "REFUSED" ? <DangerousIcon fontSize='large' sx={{marginLeft: '15px'}}/> :
+                            {value.person} - {translateLabel(value.status)}
+                            {value.status == "APPROVED" ? <CheckCircleIcon fontSize='large' sx={{marginLeft: '15px', color: 'darkgreen'}} />
+                            : (value.status == "REFUSED" ? <DangerousIcon fontSize='large' sx={{marginLeft: '15px', color: 'darkred'}}/> :
                                     <PauseCircleFilledIcon fontSize='large' sx={{marginLeft: '15px'}}/>)}
                         </Typography>
                         ))
                     }
+                    {props.remarks.length != 0 ?
+                        <Typography variant="body2" color="text.secondary" sx={{fontSize: 23, marginLeft: '60px', marginTop: '50px'}}>
+                            Забелешки:
+                        </Typography>
+                        : ""}
                     <RemarkList remarks={props.remarks}/>
                 </CardContent>
             </Card>

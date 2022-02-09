@@ -1,6 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.service;
 
-import mk.ukim.finki.masterapplicationsystem.domain.permissions.Permission;
+import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 
 public interface PermissionService {
 
@@ -13,6 +13,8 @@ public interface PermissionService {
     void canPersonTakeAction(String processId, String personId, String permissionType);
 
     void canPersonCreateMaster(String personId);
+
+    void canPersonViewMasterDetails(String processId, String personId);
 
     void canPersonCreateMasterTopic(String processId, String personId);
 

@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.List;
-
 @Data
 @Getter
 @AllArgsConstructor
-public class StepPreviewDTO {
+public class CurrentStepDTO {
 
-    String processState;
+    private String processState;
 
-    List<StepPreviewItem> stepPreviewItems;
+    private String assignedRole;
 
 }

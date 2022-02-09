@@ -87,6 +87,17 @@ public class PermissionServiceImpl implements PermissionService {
             throw new RuntimeException(String.format("Student with id: %s has already an active master.", personId));
     }
 
+    @Override
+    public void canPersonViewMasterDetails(String processId, String personId) {
+        Person person = personService.getPerson(personId);
+        if (person.getRoles().contains(Role.STUDENT) || person.getRoles().contains(Role.PROFESSOR)) {
+            Master master = processService.getProcessMaster(processId);
+            if (!Arrays.asList(master.getStudent().getId(), master.getMentor().getId(), master.getCommitteeFirst().getId(),
+                    master.getCommitteeSecond().getId()).contains(personId))
+                throw new RuntimeException(String.format("Person with id %s can not view master details", personId));
+        }
+    }
+
     private void checkIfPersonHaveRole(String personId, Role role) {
         Person person = personService.getPerson(personId);
         if (!person.getRoles().contains(role))
@@ -172,7 +183,24 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public void canPersonWriteRemark(String processId, String personId) {
-
+        ProcessState processState = processService.getProcessState(processId);
+        if (EnumSet.of(INITIAL_MENTOR_REVIEW, DRAFT_MENTOR_REVIEW, MENTOR_REPORT).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.PROFESSOR);
+            checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.PROFESSOR);
+        } else if (EnumSet.of(STUDENT_SERVICE_REVIEW, REPORT_STUDENT_SERVICE).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.STUDENT_SERVICE);
+        } else if (EnumSet.of(INITIAL_NNK_REVIEW, DRAFT_NNK_REVIEW).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.NNK);
+        } else if (EnumSet.of(INITIAL_SECRETARY_REVIEW, DRAFT_SECRETARY_REVIEW, SECOND_DRAFT_SECRETARY_REVIEW, REPORT_SECRETARY_REVIEW).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.SECRETARY);
+        } else if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, REPORT_REVIEW).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.PROFESSOR);
+            checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.COMMITTEE);
+        } else if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState)) {
+            checkIfPersonHaveRole(personId, Role.STUDENT);
+            checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.STUDENT);
+        } else
+            throw new RuntimeException("Tried to write remark in step that is not assigned to user.");
     }
 
 

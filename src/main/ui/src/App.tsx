@@ -1,5 +1,5 @@
 import React from 'react';
-import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
+import {BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {Home} from "./Home";
 import {ThemeProvider} from "@mui/material";
 import {muiTheme} from "./Theme";
@@ -9,7 +9,6 @@ import Register from "./components/auth/Register";
 import MasterTopic from "./components/master/MasterTopic";
 import MasterWrap from "./components/master-list/MasterWrap";
 import MasterDetailsWrap from "./components/master-details/MasterDetailsWrap";
-import SingleDocumentUpload from "./components/document-upload/SingleDocumentUploadPage";
 
 function App() {
     return (

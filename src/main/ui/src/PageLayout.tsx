@@ -4,6 +4,7 @@ import {Button, Container, Toolbar, Typography} from "@mui/material";
 import logo from './images/logo.png';
 import {createStyles, makeStyles} from "@mui/styles";
 import Authentication from "./components/auth/Authentication";
+import {useNavigate} from "react-router-dom";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -22,16 +23,19 @@ const useStyles = makeStyles(() =>
 
 export const PageLayout: FC = ({children}) => {
     const classes = useStyles();
+    const navigate = useNavigate();
 
     return (
         <React.Fragment>
             <AppBar position="static">
                 <Container>
                     <Toolbar>
-                        <img src={logo} alt="Kitty Katty!" className={classes.logo} />
+                        <Button color="inherit" sx={{marginRight: '30px'}}>
+                            <img src={logo} alt="Kitty Katty!" className={classes.logo} onClick={() => navigate("/")}/>
+                        </Button>
 
                         <Typography variant="h6" className={classes.title}>
-                            Ovde ke stojat menu items
+                            <Button color="inherit" onClick={() => navigate("/masters")}>Магистерски трудови</Button>
                         </Typography>
 
                         <Authentication/>

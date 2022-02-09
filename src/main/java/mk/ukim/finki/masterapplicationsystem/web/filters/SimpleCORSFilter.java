@@ -19,12 +19,10 @@ public class SimpleCORSFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
         response.setHeader("Access-Control-Allow-Credentials", "true");
         chain.doFilter(req, res);
-
     }
 
     @Override
