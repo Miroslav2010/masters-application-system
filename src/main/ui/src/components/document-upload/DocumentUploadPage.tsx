@@ -73,7 +73,10 @@ export default function DocumentUpload(props: Props) {
             formData.mentorApproval,
             formData.biography,
             formData.supplement
-        ).then(r => console.log(r));
+        ).then(r => {
+            console.log(r);
+            window.location.reload();
+        });
     }
 
     return (
@@ -84,19 +87,19 @@ export default function DocumentUpload(props: Props) {
             border: '2px solid grey',
             borderRadius: '5px'
         }}>
-            <Card variant="outlined" sx={{minHeight: '65vh', minWidth: '70vw'}}
+            <Card variant="outlined" sx={{minHeight: '85vh', minWidth: '75vw'}}
                   className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="div" color="text.secondary">
                         Прикачување на документи
                     </Typography>
                     <hr className={styles.hr}/>
-                    <TextField fullWidth label="Topic" id="topic" name="topic" sx={{maxWidth: '70%', marginTop: '40px'}}
+                    <TextField fullWidth label="Тема" id="topic" name="topic" sx={{maxWidth: '70%', marginTop: '40px'}}
                     onChange={handleChange} />
 
-                    <TextField fullWidth multiline rows={5} label="Description" id="description" name="description"
+                    <TextField fullWidth multiline rows={5} label="Опис" id="description" name="description"
                                sx={{maxWidth: '70%', marginTop: '40px'}} onChange={handleChange} />
-                    <Box sx={{ width: '100%', marginTop: '30px' }}>
+                    <Box sx={{ width: '100%', marginTop: '80px' }}>
                         <Grid container columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
                             <Grid item xs={3}>
                                 <Divider>

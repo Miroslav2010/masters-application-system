@@ -23,8 +23,8 @@ public interface RemarkService {
 
     Remark saveNewRemark(Person person, Step step);
 
-    Remark saveRemark(String processId, Person person, String remarkMessage);
+    Remark saveRemark(String processId, String remarkMessage);
 
-    Remark editRemark(String processId, Person person, String remarkId, String remarkMessage);
+    Remark editRemark(String processId, String remarkId, String remarkMessage);
 
 }

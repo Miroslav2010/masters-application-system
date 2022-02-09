@@ -32,7 +32,7 @@ public interface StepService {
     MasterTopic getMasterTopicFromProcess(String processId);
 
     MasterTopic saveMasterTopic(String processId, String userId, String topic, String description,
-                                Document application, Document mentorApproval, Document biography, Document supplement) throws IOException;
+                                Document application, Document mentorApproval, Document biography, Document supplement);
 
     MasterTopic editMasterTopic(String processId, String userId, String topic, String description,
                                 MultipartFile application, MultipartFile mentorApproval, MultipartFile biography, MultipartFile supplement) throws IOException;
@@ -47,9 +47,9 @@ public interface StepService {
 
     Attachment getAttachmentFromProcess(String processId, String name);
 
-    Attachment saveAttachment(String processId, ProcessState processState, String personId, MultipartFile draft) throws IOException;
+    Attachment saveAttachment(String processId, ProcessState processState, String personId, Document draft);
 
-    Attachment initializeAttachment(String processId) throws IOException;
+    Attachment initializeAttachment(String processId);
 
     Attachment editAttachment(String processId, ProcessState processState, String personId, String attachmentStepName, MultipartFile file) throws IOException;
 

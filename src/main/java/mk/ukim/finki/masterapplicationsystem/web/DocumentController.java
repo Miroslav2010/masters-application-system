@@ -8,10 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/api/document")
 public class DocumentController {
     private MasterManagementService masterManagementService;

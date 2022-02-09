@@ -8,6 +8,7 @@ import {StudentDto} from "../../domain/StudentDto";
 import RemarkService from "../../service/remarkService";
 import {RemarkDTO} from "../../domain/remarkResponse";
 import {StepValidationDto} from "../../domain/StepValidationDto";
+import {CurrentStepDto} from "../../domain/CurrentStepDto";
 
 interface Props {
     params: string;
@@ -15,12 +16,17 @@ interface Props {
 
 interface State {
     processId: string
+    processState: string,
     steps: StepPreviewDto[];
-    currentStep: StepPreviewDto | undefined;
+    // currentStep: StepPreviewDto | undefined;
     stepHistory: StepHistoryDto | undefined;
     student: StudentDto | undefined,
     remarks: RemarkDTO[],
-    validations: StepValidationDto[]
+    validations: StepValidationDto[],
+    currentStep: CurrentStepDto | undefined,
+    loadingInfo: boolean,
+    loadingValidation: boolean,
+    loadingRemarks: boolean
 }
 
 class MasterDetailsWrap extends React.Component<Props, State> {
@@ -32,24 +38,36 @@ class MasterDetailsWrap extends React.Component<Props, State> {
             processId: this.props.params,
             steps: [],
             stepHistory: undefined,
-            currentStep: undefined,
+            // currentStep: undefined,
             student: undefined,
+            currentStep: undefined,
             remarks: [],
-            validations: []
+            validations: [],
+            loadingInfo: true,
+            loadingValidation: true,
+            loadingRemarks: true,
+            processState: ""
         }
     }
 
 
     componentDidMount() {
         console.log("did mount");
+        this.getData();
+    }
+
+    getData() {
         masterService.getAllSteps(this.state.processId)
             .then(steps => {
                 console.log(steps);
                 if (steps.length == 0)
                     return;
                 this.setState({
-                    steps: steps.slice(0, -1),
-                    currentStep: steps[steps.length - 1]
+                    steps: steps.stepPreviewItems,
+                    processState: steps.processState,
+                    loadingInfo: false,
+                    loadingValidation: false,
+                    loadingRemarks: false
                 })
             });
         masterService.getStudent(this.state.processId)
@@ -59,32 +77,54 @@ class MasterDetailsWrap extends React.Component<Props, State> {
                     student: student
                 })
             });
+        masterService.getCurrentStepInfo(this.state.processId)
+            .then(currentStep => {
+                this.setState({
+                    currentStep: currentStep
+                })
+            });
     }
 
     render() {
         return (
-            <MasterDetails processId={this.state.processId} steps={this.state.steps} getHistoryStep={this.getHistoryStep}
-                           historyStep={this.state.stepHistory} student={this.state.student} remarks={this.state.remarks}
-                           validations={this.state.validations} currentStep={this.state.currentStep}/>
+            <div>
+                {/*{this.stillLoading() && <LinearProgress sx={{height: '6px'}}/> }*/}
+                <MasterDetails processId={this.state.processId} steps={this.state.steps} getHistoryStep={this.getHistoryStep}
+                               historyStep={this.state.stepHistory} student={this.state.student} remarks={this.state.remarks}
+                               validations={this.state.validations} processState={this.state.processState} newData={this.stillLoading()}
+                               currentStep={this.state.currentStep}/>
+            </div>
         )
     }
 
+    stillLoading() {
+        return this.state.loadingInfo || this.state.loadingValidation || this.state.loadingRemarks;
+    }
+
     getHistoryStep = (stepId: string) => {
+        this.setState({
+            loadingInfo: true,
+            loadingValidation: true,
+            loadingRemarks: true
+        });
         masterService.getHistoryStep(stepId)
             .then(stepHistory =>
                 this.setState({
-                    stepHistory: stepHistory
+                    stepHistory: stepHistory,
+                    loadingInfo: false
                 })
             );
         RemarkService.getRemarksForStep(stepId)
             .then(remarks =>
                 this.setState({
-                    remarks: remarks
+                    remarks: remarks,
+                    loadingRemarks: false
                 }));
         masterService.getStepValidations(stepId)
             .then(validations =>
                 this.setState({
-                    validations: validations
+                    validations: validations,
+                    loadingValidation: false
                 }));
     }
 

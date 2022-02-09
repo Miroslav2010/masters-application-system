@@ -4,15 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.List;
-
 @Data
 @Getter
 @AllArgsConstructor
-public class StepPreviewDTO {
+public class StepPreviewItem {
 
-    String processState;
+    String id;
 
-    List<StepPreviewItem> stepPreviewItems;
+    String name;
 
+    String type;
 }

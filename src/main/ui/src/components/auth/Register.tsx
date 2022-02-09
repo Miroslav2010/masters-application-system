@@ -132,7 +132,7 @@ class Register extends React.Component<IProps,IState> {
                     <Grid item xs={4}>
                         <Button onClick={() => {
                             this.handleRegister()
-                        }} variant="outlined">Register</Button>
+                        }} variant="contained">Register</Button>
                     </Grid>
                 </Grid>
 

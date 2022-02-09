@@ -10,6 +10,8 @@ public interface ProcessService {
 
     List<Process> findAll();
 
+    List<Process> findAllByPersonAssigned(String personId);
+
     Process findProcessById(String id);
 
     Master getProcessMaster(String id);
