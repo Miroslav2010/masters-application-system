@@ -3,6 +3,7 @@ import AppBar from '@mui/material/AppBar';
 import {Button, Container, Toolbar, Typography} from "@mui/material";
 import logo from './images/logo.png';
 import {createStyles, makeStyles} from "@mui/styles";
+import Authentication from "./components/auth/Authentication";
 import {useNavigate} from "react-router-dom";
 
 const useStyles = makeStyles(() =>
@@ -37,8 +38,7 @@ export const PageLayout: FC = ({children}) => {
                             <Button color="inherit" onClick={() => navigate("/masters")}>Магистерски трудови</Button>
                         </Typography>
 
-                        <Button color="inherit" onClick={() => navigate("/login")} sx={{marginRight: '20px'}}>Login</Button>
-                        <Button color="inherit" onClick={() => navigate("/register")}>Register</Button>
+                        <Authentication/>
                     </Toolbar>
                 </Container>
             </AppBar>
