@@ -29,6 +29,13 @@ const masterService = {
         })
             .then(result => result.data);
     },
+    uploadDraft: (processId: string, application: File | null)=>{
+        return instance.post("/api/master/draft",{
+            processId: processId,
+            draft: application
+        },{withCredentials:true})
+    }
+    ,
 
     getAllMasters: () => {
         return axios.get(`/api/master/all`)

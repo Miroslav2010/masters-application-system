@@ -3,6 +3,7 @@ import AppBar from '@mui/material/AppBar';
 import {Button, Container, Toolbar, Typography} from "@mui/material";
 import logo from './images/logo.png';
 import {createStyles, makeStyles} from "@mui/styles";
+import Authentication from "./components/auth/Authentication";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -33,7 +34,7 @@ export const PageLayout: FC = ({children}) => {
                             Ovde ke stojat menu items
                         </Typography>
 
-                        <Button color="inherit">Login</Button>
+                        <Authentication/>
                     </Toolbar>
                 </Container>
             </AppBar>

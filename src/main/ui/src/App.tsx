@@ -9,6 +9,7 @@ import Register from "./components/auth/Register";
 import MasterTopic from "./components/master/MasterTopic";
 import MasterWrap from "./components/master-list/MasterWrap";
 import MasterDetailsWrap from "./components/master-details/MasterDetailsWrap";
+import SingleDocumentUpload from "./components/document-upload/SingleDocumentUploadPage";
 
 function App() {
     return (
