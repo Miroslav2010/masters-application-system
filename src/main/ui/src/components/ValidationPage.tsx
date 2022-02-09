@@ -1,6 +1,5 @@
 import React from "react";
 import {useParams} from 'react-router-dom';
-import {PageLayout} from "../PageLayout";
 import ValidationService from "../service/validationService";
 import {Box, Button, Card, CardActions, CardContent, Typography} from "@mui/material";
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -14,6 +13,7 @@ import styles from './ValidationPage.style.module.css'
 
 interface Props {
     params: string;
+    navigation: any
 }
 
 interface State {
@@ -67,7 +67,7 @@ class ValidationPage extends React.Component<Props, State> {
         return (
             // <PageLayout>
                 <Box component="div" sx={{display: 'block', transform: 'scale(0.9)', marginTop: '10px', border: '2px solid grey', borderRadius: '5px'}}>
-                    <Card variant="outlined" sx={{minHeight: '65vh'}} className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
+                    <Card variant="outlined" sx={{minHeight: '65vh', minWidth: '70vw'}} className={`${styles.flex} ${styles.flexColumnDirection} ${styles.spaceBetween}`}>
                         <CardContent>
                             <Typography gutterBottom variant="h5" component="div" color="text.secondary">
                                 {this.state.stepName}
@@ -215,7 +215,7 @@ class ValidationPage extends React.Component<Props, State> {
             open: true,
             remark: this.state.remarks[index].remark,
             editRemarkId: this.state.remarks[index].remarkId
-        })
+        });
     }
 
     private deleteRemark = (remarkId: string) => {
@@ -244,7 +244,10 @@ class ValidationPage extends React.Component<Props, State> {
 
     validateStep(validationStatus: string) {
         ValidationService.validate(this.state.processId, validationStatus)
-            .then(_ => this.disableButtons());
+            .then(_ => {
+                this.disableButtons();
+                window.location.reload();
+            });
     }
 
 }

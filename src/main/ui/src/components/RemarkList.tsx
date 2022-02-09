@@ -13,7 +13,7 @@ interface Props {
 
 const RemarkList = (props: Props) => {
     return (
-    <List sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '30px' }}>
+    <List sx={{ bgcolor: 'background.paper', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
         {props.remarks.map((value, index) => (
             <ListItem key={index}  sx={{ border: '1px solid grey', borderRadius: '5px', width: '90%', display: 'block', marginBottom: '20px'}}
                       secondaryAction={
@@ -22,7 +22,7 @@ const RemarkList = (props: Props) => {
                               <IconButton onClick={() => props.editRemark != undefined ? props.editRemark(index) : ""}>
                                   <EditIcon />
                               </IconButton>
-                              <IconButton onClick={() => props.deleteRemark != undefined ? props.deleteRemark(index) : ""}>
+                              <IconButton onClick={() => props.deleteRemark != undefined ? props.deleteRemark(value.remarkId) : ""}>
                                   <DeleteIcon />
                               </IconButton>
                           </Stack>

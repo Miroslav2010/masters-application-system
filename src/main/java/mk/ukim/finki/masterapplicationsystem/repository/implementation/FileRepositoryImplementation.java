@@ -2,9 +2,9 @@ package mk.ukim.finki.masterapplicationsystem.repository.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.configuration.FileSystemConfiguration;
 import mk.ukim.finki.masterapplicationsystem.repository.FileRepository;
-import org.aspectj.util.FileUtil;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,6 +12,9 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Date;
 
 
@@ -35,9 +38,8 @@ public class FileRepositoryImplementation implements FileRepository {
 
     public String save(String userId, MultipartFile file, String subFolder) throws IOException {
         this.checkDirectoriesForUser(userId);
-        String saveLocation =  "/" + userId + subFolder + "/" + new Date().getTime() + file.getName();
-        File localFile = new File(makeFullPath(saveLocation));
-        file.transferTo(localFile);
+        String saveLocation =  "/" + userId + subFolder + "/" + new Date().getTime() + file.getOriginalFilename();
+        Files.copy(file.getInputStream(), Paths.get(makeFullPath(saveLocation)), StandardCopyOption.REPLACE_EXISTING);
         return saveLocation;
     }
 

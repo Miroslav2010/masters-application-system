@@ -2,9 +2,7 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.StepPreviewDTO;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
@@ -14,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -59,13 +56,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     private void setUpDraftStep(String processId) {
-        // just temporary
-        try {
-            stepService.initializeAttachment(processId);
-        }
-        catch (Exception e) {
-
-        }
+        stepService.initializeAttachment(processId);
     }
 
     private void setUpNewStep(String processId) {
@@ -75,30 +66,23 @@ public class MasterManagementServiceImpl implements MasterManagementService {
             return;
         if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT, MENTOR_REPORT).contains(processState))
             setUpDraftStep(processId);
-        else if (processState == DOCUMENT_APPLICATION) {
-            try {
+        else if (processState == DOCUMENT_APPLICATION)
                 setUpNewMasterTopic(processId);
-            }
-            catch (Exception e){
-
-            }
-        }
         else
             setUpNewValidation(processId);
     }
 
-    private void setUpNewMasterTopic(String processId) throws IOException {
+    private void setUpNewMasterTopic(String processId) {
         MasterTopic masterTopic = null;
         if(stepService.doesStepExist(processId, DOCUMENT_APPLICATION.toString()))
             masterTopic = stepService.getMasterTopicFromProcess(processId);
         Master master = processService.getProcessMaster(processId);
         // TODO: get files from previous master topic
-//        MockMultipartFile file = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "app files".getBytes());
-        Document document = null;
         if(masterTopic == null)
             stepService.saveMasterTopic(processId, master.getStudent().getId(), "", "", null, null, null, null);
         else stepService.saveMasterTopic(processId, master.getStudent().getId(), masterTopic.getTopic(),
-                masterTopic.getDescription(), document, document, document, document);
+                masterTopic.getDescription(), masterTopic.getApplication(), masterTopic.getMentorApproval(),
+                masterTopic.getBiography(), masterTopic.getSupplement());
     }
 
 //    it's best to create remark when someone leave remark
@@ -249,8 +233,8 @@ public class MasterManagementServiceImpl implements MasterManagementService {
 
     @Override
     public ValidationResponseDTO getValidationDetails(String processId) {
-//        Person loggedInUser = personService.getLoggedInUser();
-//        permissionService.canPersonValidateMaster(processId, "b15a901f-5c68-4f97-ba63-28180aa927fa");
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
         ProcessState state = processService.getProcessState(processId);
         Master master = processService.getProcessMaster(processId);
         List<String> documentLocations = getDocumentLocations(processId);
@@ -260,35 +244,56 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     private MasterPreviewDTO getMasterDetails(Process process) {
         Master master = process.getMaster();
         String state = process.getProcessState().label;
+        Step step = stepService.getActiveStep(process.getId());
         return new MasterPreviewDTO(process.getId(), master.getStudent().getFullName(), master.getMentor().getFullName(),
-                state, OffsetDateTime.now().format(DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm")));
+                state, step.getCreated().format(DateTimeFormatter.ofPattern( "dd-MM-yyyy HH:mm")));
     }
 
     @Override
     public List<MasterPreviewDTO> getAllMasters() {
-        List<Process> processes = processService.findAll();
+        Person person = personService.getLoggedInUser();
+        List<Process> processes = new ArrayList<>();
+        if (person.getRoles().contains(Role.STUDENT_SERVICE) || person.getRoles().contains(Role.SECRETARY)
+                || person.getRoles().contains(Role.NNK))
+            processes.addAll(processService.findAll());
+        else
+            processes.addAll(processService.findAllByPersonAssigned(person.getId()));
         List<MasterPreviewDTO> masters = new ArrayList<>();
         processes.forEach(s -> masters.add(getMasterDetails(s)));
         return masters;
     }
 
     @Override
-    public List<StepPreviewDTO> getAllFinishedSteps(String processId) {
+    public StepPreviewDTO getAllFinishedSteps(String processId) {
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
+        //TODO:
+        //current ne go davas zzosto tamu popolnuvas, samo ke pratime state da znaeme koja komponenta da ja renderirame
         ProcessState processState = processService.getProcessState(processId);
         String typeOfStep = processStateHelperService.getTypeOfStep(processState);
-        List<StepPreviewDTO> steps = new ArrayList<>();
-        stepService.findAllLastInstanceSteps(processId).forEach(s -> steps.add(new StepPreviewDTO(s.getId(), s.getName(), typeOfStep)));
-        return steps;
+        List<StepPreviewItem> steps = new ArrayList<>();
+        stepService.findAllLastInstanceSteps(processId).forEach(s -> steps.add(new StepPreviewItem(s.getId(), s.getName(), typeOfStep)));
+        StepPreviewDTO stepPreviewDTO = new StepPreviewDTO(typeOfStep, steps);
+        return stepPreviewDTO;
     }
 
     @Override
     public Student getStudent(String processId) {
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
         return processService.getProcessMaster(processId).getStudent();
     }
 
+    @Override
+    public CurrentStepDTO getCurrentStepInfo(String processId) {
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
+        ProcessState processState = processService.getProcessState(processId);
+        return new CurrentStepDTO(processState.toString(), loggedInUser.getRoles().get(0).toString());
+    }
+
     private List<String> getDocumentLocations(String processId) {
-//        ProcessState processState = processService.getProcessState(processId);
-        ProcessState processState = DOCUMENT_APPLICATION;
+        ProcessState processState = processService.getProcessState(processId);
         ProcessState draftState = firstStepFromPhase(processState);
         List<String> documentLocations = new ArrayList<>();
         if (draftState == DOCUMENT_APPLICATION) {
@@ -298,13 +303,18 @@ public class MasterManagementServiceImpl implements MasterManagementService {
             documentLocations.add(masterTopic.getMentorApproval().getLocation());
             documentLocations.add(masterTopic.getSupplement().getLocation());
         }
+        //TODO: take from student draft if there is not student changes draft
         else if (draftState == STUDENT_DRAFT) {
-            Attachment attachment = stepService.getAttachmentFromProcess(processId, STUDENT_DRAFT.toString());
+            Attachment attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
             documentLocations.add(attachment.getDocument().getLocation());
         }
         else if (draftState == STUDENT_CHANGES_DRAFT) {
             // when should be STUDENT_CHANGES_DRAFT and when MENTOR_REVIEW
-            Attachment attachment = stepService.getAttachmentFromProcess(processId, STUDENT_CHANGES_DRAFT.toString());
+            Attachment attachment = null;
+            if (stepService.doesStepExist(processId, draftState.toString()))
+                attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
+            else
+                attachment = stepService.getAttachmentFromProcess(processId, STUDENT_DRAFT.toString());
             documentLocations.add(attachment.getDocument().getLocation());
         }
         return documentLocations;

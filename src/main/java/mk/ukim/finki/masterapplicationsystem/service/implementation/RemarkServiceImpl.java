@@ -6,6 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.Step;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.RemarkResponseDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.mapper.RemarkMapper;
 import mk.ukim.finki.masterapplicationsystem.repository.RemarkRepository;
+import mk.ukim.finki.masterapplicationsystem.service.PermissionService;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import mk.ukim.finki.masterapplicationsystem.service.RemarkService;
 import mk.ukim.finki.masterapplicationsystem.service.StepService;
@@ -23,13 +24,15 @@ public class RemarkServiceImpl implements RemarkService {
     private final RemarkRepository remarkRepository;
     private final StepService stepService;
     private final PersonService personService;
+    private final PermissionService permissionService;
 
     private final Logger logger = LoggerFactory.getLogger(RemarkServiceImpl.class);
 
-    public RemarkServiceImpl(RemarkRepository remarkRepository, StepService stepService, PersonService personService) {
+    public RemarkServiceImpl(RemarkRepository remarkRepository, StepService stepService, PersonService personService, PermissionService permissionService) {
         this.remarkRepository = remarkRepository;
         this.stepService = stepService;
         this.personService = personService;
+        this.permissionService = permissionService;
     }
 
     @Override
@@ -37,28 +40,27 @@ public class RemarkServiceImpl implements RemarkService {
         return remarkRepository.findById(id).orElseThrow(() -> new RuntimeException("Remark with id " + id + " was not found"));
     }
 
-    public Remark saveRemark(String processId, Person person, String remarkMessage) {
-        //TODO: Rollback maybe
+    public Remark saveRemark(String processId, String remarkMessage) {
+        Person person = personService.getLoggedInUser();
+        permissionService.canPersonWriteRemark(processId, person.getId());
         Step currentStep = stepService.getActiveStep(processId);
-//        Remark remark = remarkMapper.remarkDtoToRemark(remarkDto);
         Remark remark = new Remark(person, currentStep);
-//        remark.setStep(currentStep);
         remark.setRemark(remarkMessage);
         remark.setDateTime(OffsetDateTime.now());
         return remarkRepository.save(remark);
     }
 
     @Override
-    public Remark editRemark(String processId, Person person, String remarkId, String remarkMessage) {
+    public Remark editRemark(String processId, String remarkId, String remarkMessage) {
         //can make remark
+        Person person = personService.getLoggedInUser();
+        permissionService.canPersonWriteRemark(processId, person.getId());
         Step currentStep = stepService.getActiveStep(processId);
         Remark remark = findById(remarkId);
         remark.setRemark(remarkMessage);
         remark.setDateTime(OffsetDateTime.now());
         return remarkRepository.save(remark);
     }
-
-
 
     @Override
     public List<Remark> findAllByStepId(String stepId) {
@@ -78,7 +80,7 @@ public class RemarkServiceImpl implements RemarkService {
 
     @Override
     public List<RemarkResponseDTO> findAllRemarksForCurrentStep(String processId) {
-//        Person loggedInPerson = personService.getLoggedInUser();
+        Person loggedInPerson = personService.getLoggedInUser();
         //TODO: Find by person id and step id
         Step step = stepService.getActiveStep(processId);
         List<Remark> remarks = remarkRepository.findAllByStepId(step.getId());
@@ -89,14 +91,17 @@ public class RemarkServiceImpl implements RemarkService {
 
     @Override
     public Remark deleteById(String remarkId) {
+        Person loggedInPerson = personService.getLoggedInUser();
         Remark remark = remarkRepository.getById(remarkId);
+        if (remark.getPerson().getId().equals(loggedInPerson.getId()))
+            throw new RuntimeException("User tried to delete a remark that is not created by him.");
         remarkRepository.deleteById(remarkId);
         return remark;
     }
 
     public Remark saveNewRemark(Person person, Step step) {
-        //get active user
-        Remark remark = new Remark(person, step);
+        Person loggedInPerson = personService.getLoggedInUser();
+        Remark remark = new Remark(loggedInPerson, step);
         return remarkRepository.save(remark);
     }
 }

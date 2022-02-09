@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/history")
-@CrossOrigin()
+@CrossOrigin(value = "http://localhost:3000")
 public class HistoryController {
     private final StepService stepService;
     private final StepValidationService stepValidationService;

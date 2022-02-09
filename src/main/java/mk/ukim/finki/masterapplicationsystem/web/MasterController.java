@@ -3,9 +3,7 @@ package mk.ukim.finki.masterapplicationsystem.web;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.StepPreviewDTO;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.ValidationResponseDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.*;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
@@ -18,7 +16,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@CrossOrigin
+@CrossOrigin(value = "http://localhost:3000")
 @RequestMapping("/api/master")
 public class MasterController {
     private final MasterService masterService;
@@ -56,9 +54,9 @@ public class MasterController {
     public MasterTopic createMasterTopic(@PathVariable String processId, @RequestParam String topic, @RequestParam String description,
                                          @RequestParam MultipartFile biography, @RequestParam MultipartFile mentorApproval, @RequestParam MultipartFile application,
                                          @RequestParam MultipartFile supplement) throws IOException {
-        MockMultipartFile firstFile = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
-        return masterManagementService.createMasterTopic(processId, topic,
-                description, biography, mentorApproval,
+        if(topic.equals(""))
+            throw new RuntimeException();
+        return masterManagementService.createMasterTopic(processId, topic, description, biography, mentorApproval,
                 application, supplement);
     }
 
@@ -72,10 +70,12 @@ public class MasterController {
         return masterManagementService.setArchiveNumber(archiveNumberDTO.getProcessId(), archiveNumberDTO.getArchiveNumber());
     }
 
-    @PostMapping("/draft")
-    public Attachment uploadDraft(@RequestBody DraftDTO draftDTO) throws IOException {
-        MockMultipartFile draft = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "some draft".getBytes());
-        return masterManagementService.uploadDraft(draftDTO.getProcessId(), draft);
+    @PostMapping("/{processId}/draft")
+    public Attachment uploadDraft(@PathVariable String processId, @RequestParam MultipartFile draft) throws IOException {
+        MockMultipartFile draftt = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "some draft".getBytes());
+        Attachment attachment = masterManagementService.uploadDraft(processId, draftt);
+        confirmUpload(processId);
+        return attachment;
     }
 
     @PostMapping("/confirm-draft")
@@ -101,13 +101,18 @@ public class MasterController {
     }
 
     @GetMapping("/{processId}/all-steps")
-    public List<StepPreviewDTO> getSteps(@PathVariable String processId) {
+    public StepPreviewDTO getSteps(@PathVariable String processId) {
         return masterManagementService.getAllFinishedSteps(processId);
     }
 
     @GetMapping("/{processId}/student")
     public Student getStudent(@PathVariable String processId) {
         return masterManagementService.getStudent(processId);
+    }
+
+    @GetMapping("/{processId}/current-step")
+    public CurrentStepDTO getCurrentStepInfo (@PathVariable String processId) {
+        return masterManagementService.getCurrentStepInfo(processId);
     }
 
 }

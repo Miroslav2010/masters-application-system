@@ -26,6 +26,11 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public List<Process> findAllByPersonAssigned(String personId) {
+        return processRepository.findAllByMaster_StudentIdOrMaster_MentorIdOrMaster_CommitteeFirstIdOrMaster_CommitteeSecondId(personId, personId, personId, personId);
+    }
+
+    @Override
     public Process findProcessById(String id) {
         return processRepository.findById(id).orElseThrow(() -> new RuntimeException("Process with id " + id + " was not found"));
     }
