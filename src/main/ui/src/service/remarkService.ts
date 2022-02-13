@@ -7,7 +7,7 @@ const RemarkService = {
     },
 
     addRemark: (processId: string | undefined, remark: string, remarkId: string | undefined) => {
-        console.log(remark);
+        console.log(remarkId);
         if (remarkId != undefined)
             return axios.post(`/api/remark/${processId}/edit`, {
                 remarkId: remarkId,

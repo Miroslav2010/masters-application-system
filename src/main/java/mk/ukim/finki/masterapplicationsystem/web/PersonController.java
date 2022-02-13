@@ -63,7 +63,12 @@ public class PersonController {
 
     @GetMapping("/professors")
     public ResponseEntity<List<Person>> getAllProfessors() {
-        return ResponseEntity.ok(personService.getProfessors());
+        return ResponseEntity.ok(personService.getAllPersonsFromRole(Role.PROFESSOR));
+    }
+
+    @GetMapping("/students")
+    public ResponseEntity<List<Person>> getAllStudents() {
+        return ResponseEntity.ok(personService.getAllPersonsFromRole(Role.STUDENT));
     }
 
     @GetMapping("/roles")

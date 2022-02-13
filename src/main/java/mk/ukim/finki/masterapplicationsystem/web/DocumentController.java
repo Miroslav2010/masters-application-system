@@ -1,5 +1,6 @@
 package mk.ukim.finki.masterapplicationsystem.web;
 
+import mk.ukim.finki.masterapplicationsystem.domain.Document;
 import mk.ukim.finki.masterapplicationsystem.service.DocumentService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import org.springframework.core.io.Resource;
@@ -25,7 +26,7 @@ public class DocumentController {
     public ResponseEntity<Resource> downloadFile(@RequestParam String fileLocation) throws IOException {
         Resource downloadFile = documentService.findFileByLocation(fileLocation);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + "basic-file" + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFile.getFile().getName() + "\"")
                 .body(downloadFile);
     }
 

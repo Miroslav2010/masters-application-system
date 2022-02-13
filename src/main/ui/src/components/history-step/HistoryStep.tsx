@@ -11,6 +11,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import DangerousIcon from '@mui/icons-material/Dangerous';
 import PauseCircleFilledIcon from '@mui/icons-material/PauseCircleFilled';
 import masterService from "../../service/masterService";
+import FileOpenIcon from '@mui/icons-material/FileOpen';
 
 interface Props {
     historyStep: StepHistoryDto,
@@ -54,10 +55,11 @@ const HistoryStep = (props: Props) => {
                         <Typography variant="body2" color="text.secondary" sx={{fontSize: 23}}>
                             Прикачени документи:
                         </Typography> : ""}
-                    <Typography variant="body2" color="text.secondary" sx={{fontSize: 18, marginTop: '30px', display: 'flex', wordBreak: 'break-all'}}>
+                    <Typography variant="body2" color="text.secondary" className={ `${styles.wordBreakFileName}` } sx={{fontSize: 18, marginTop: '30px', display: 'flex', wordBreak: 'break-all'}}>
                         {props.historyStep?.application != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.application.location}
+                                <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.application.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
@@ -66,6 +68,7 @@ const HistoryStep = (props: Props) => {
                         {props.historyStep?.biography != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.biography.location}
+                                <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.biography.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
@@ -74,6 +77,7 @@ const HistoryStep = (props: Props) => {
                         {props.historyStep?.mentorApproval != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.mentorApproval.location}
+                                <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.mentorApproval.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
@@ -82,14 +86,16 @@ const HistoryStep = (props: Props) => {
                         {props.historyStep?.supplement != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {props.historyStep?.supplement.location}
+                                <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.supplement.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
                         {props.historyStep?.document != null ?
-                            <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
+                            <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter} ${styles.wordBreakFileName}`}>
                                         {props.historyStep?.document.location}
+                                <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
                                 <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.document.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>

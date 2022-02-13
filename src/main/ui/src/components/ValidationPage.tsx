@@ -10,6 +10,7 @@ import RemarkList from "./RemarkList";
 import RemarkService from "../service/remarkService";
 import {RemarkDTO} from "../domain/remarkResponse";
 import styles from './ValidationPage.style.module.css'
+import FileOpenIcon from "@mui/icons-material/FileOpen";
 
 interface Props {
     params: string;
@@ -88,6 +89,7 @@ class ValidationPage extends React.Component<Props, State> {
                                 {this.state.downloadFileUrls.map((value, index) => (
                                     <span key={index} className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {value}
+                                        <FileOpenIcon fontSize='medium' color="secondary" sx={{ marginLeft: '3px' }}/>
                                         <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + value} >
                                             <DownloadForOfflineRoundedIcon fontSize='large'/>
                                         </IconButton>
@@ -178,6 +180,7 @@ class ValidationPage extends React.Component<Props, State> {
 
     private handleDialogClose = (save: boolean) => {
         console.log(save);
+        console.log(this.state.editRemarkId);
         if (save) {
             RemarkService.addRemark(this.state.processId, this.state.remark, this.state.editRemarkId)
                 .then(() => this.getAllRemarks(this.state.processId));
@@ -186,6 +189,7 @@ class ValidationPage extends React.Component<Props, State> {
         this.setState({
             open: false,
             remark: "",
+            defaultRemark: "",
             editRemarkId: undefined
         })
     }
@@ -243,9 +247,9 @@ class ValidationPage extends React.Component<Props, State> {
     }
 
     validateStep(validationStatus: string) {
+        this.disableButtons();
         ValidationService.validate(this.state.processId, validationStatus)
             .then(_ => {
-                this.disableButtons();
                 window.location.reload();
             });
     }

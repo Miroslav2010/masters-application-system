@@ -11,8 +11,6 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import {StepPreviewDto} from "../../domain/stepPreviewDto";
 import {StepHistoryDto} from "../../domain/StepHistoryDto";
 import HistoryStep from "../history-step/HistoryStep";
@@ -25,12 +23,16 @@ import DocumentUpload from "../document-upload/DocumentUploadPage";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {Button} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import RestartAltIcon from '@mui/icons-material/RestartAlt';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CircularProgress from '@mui/material/CircularProgress';
 import masterService from "../../service/masterService";
 import AttachmentPage from "../attachment/AttachmentPage";
 import {CurrentStepDto} from "../../domain/CurrentStepDto";
+import personService from "../../service/personService";
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import RuleIcon from '@mui/icons-material/Rule';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
+import {PersonDto} from "../../domain/PersonDto";
 
 const drawerWidth = 400;
 
@@ -42,6 +44,7 @@ interface Props {
     getHistoryStep: Function,
     historyStep: StepHistoryDto | undefined,
     student: StudentDto | undefined,
+    mentor: PersonDto | undefined,
     remarks: RemarkDTO[],
     validations: StepValidationDto[],
     newData: boolean
@@ -54,13 +57,44 @@ export default function MasterDetails(props: Props) {
     const [loading, setLoading] = useState(false);
     // console.log(loading);
     const navigate = useNavigate();
-
     const goBack = () => {
         navigate("/masters");
     }
 
     const translate = (name: string) => {
         return masterService.translate(name);
+    }
+
+    const isAssignedOnThisStep = () => {
+        console.log(props.currentStep?.assignedPersons);
+        console.log(props.currentStep?.assignedRole);
+        let loggedInPerson = personService.getLoggedInUser();
+        if (loggedInPerson == "")
+            return false;
+
+        if (props.currentStep?.assignedPersons.length == 0 && loggedInPerson["roles"][0] == props.currentStep?.assignedRole)
+            return true;
+        return props.currentStep?.assignedPersons.includes(loggedInPerson["fullName"]);
+    }
+
+    const showCancelLoopButton = () => {
+        let loggedInUser = personService.getLoggedInUser();
+        if (loggedInUser == "")
+            return false;
+        console.log(props.currentStep?.assignedRole);
+        console.log(loggedInUser);
+        return loggedInUser["roles"][0] == "PROFESSOR" &&
+            loggedInUser["fullName"] == props.mentor?.fullName &&
+            (props.currentStep?.processState == "STUDENT_CHANGES_DRAFT" || props.currentStep?.processState == "DRAFT_COMMITTEE_REVIEW");
+    }
+
+    const cancelChangeLoop = () => {
+        masterService.cancelChangeLoop(props.processId)
+            .then(_ => window.location.reload());
+    }
+
+    const showMasterManageButtons = () => {
+
     }
 
     return (
@@ -94,15 +128,21 @@ export default function MasterDetails(props: Props) {
                         Назад
                     </Button>
                     <div style={{marginTop: '20px', marginBottom: '50px'}}>
-                        <Button variant="contained" color="error" endIcon={<RestartAltIcon />} sx={{width: '40%', marginLeft: '10px',
-                            backgroundColor: 'darkred'}}>
-                            Ресетирај
-                        </Button>
-                        <Button variant="contained" color="error" endIcon={<DeleteIcon />} sx={{width: '40%', marginLeft: '30px',
-                            backgroundColor: 'darkred'}}
+                        {/*<Button variant="contained" color="error" endIcon={<RestartAltIcon />} sx={{width: '40%', marginLeft: '10px',*/}
+                        {/*    backgroundColor: 'darkred'}}>*/}
+                        {/*    Ресетирај*/}
+                        {/*</Button>*/}
+                        {/*<Button variant="contained" color="error" endIcon={<DeleteIcon />} sx={{width: '40%', marginLeft: '30px',*/}
+                        {/*    backgroundColor: 'darkred'}}*/}
+                        {/*>*/}
+                        {/*    Избриши*/}
+                        {/*</Button>*/}
+                        {showCancelLoopButton() &&
+                        <Button variant="contained" color="error" endIcon={<HighlightOffIcon />} sx={{width: '70%', marginLeft: '10px',
+                            backgroundColor: 'darkred'}} onClick={() => cancelChangeLoop()}
                         >
-                            Избриши
-                        </Button>
+                            Прекини промени
+                        </Button>}
                     </div>
                     <Divider/>
                     <List>
@@ -112,9 +152,10 @@ export default function MasterDetails(props: Props) {
                             setCurrentStepActive(true);
                         }}>
                             <ListItemIcon>
-                                <InboxIcon/>
+                                {props.processState == "Validation" ? <RuleIcon/> :
+                                    (props.processState == "Finished" ? <HowToRegOutlinedIcon /> : <UploadFileIcon/>)}
                             </ListItemIcon>
-                            <ListItemText primary={props.processState}/>
+                            <ListItemText primary={translate(props.currentStep?.processState!)}/>
                         </ListItem>
                     </List>
                     <Divider/>
@@ -127,7 +168,7 @@ export default function MasterDetails(props: Props) {
                                 setLoading(true);
                             }}>
                                 <ListItemIcon>
-                                    {index % 2 === 0 ? <InboxIcon/> : <MailIcon/>}
+                                    {step.type == "Validation" ? <RuleIcon/> : <UploadFileIcon/>}
                                 </ListItemIcon>
                                 <ListItemText primary={translate(step.name)}/>
                             </ListItem>
@@ -147,11 +188,10 @@ export default function MasterDetails(props: Props) {
                         <CircularProgress disableShrink size={70} />
                     </div>
                 </Box>}
-
                 {/*{props.processState != "Validation" && currentStep ? (props.processState == "MasterTopic" ? <DocumentUpload processId={props.processId}/>*/}
-                {currentStepActive ? (props.processState == "MasterTopic" ? <DocumentUpload processId={props.processId}/>
+                {currentStepActive ? (isAssignedOnThisStep() && (props.processState == "MasterTopic" ? <DocumentUpload processId={props.processId}/>
                     : (props.processState == "Validation" ? <ValidationPage /> :
-                        (props.processState == "Attachment" ? <AttachmentPage processId={props.processId} label={props.currentStep?.processState} /> : "")))
+                        (props.processState == "Attachment" ? <AttachmentPage processId={props.processId} label={props.currentStep?.processState} /> : ""))))
                         // : (props.currentStep?.type == "Attachment" ? < /> : )))
                     : props.historyStep != undefined &&
                     <HistoryStep historyStep={props.historyStep} remarks={props.remarks} validations={props.validations} />}

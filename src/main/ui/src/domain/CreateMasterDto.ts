@@ -1,6 +1,6 @@
-export interface CreateMasterDto{
-    majorId:string,
-    mentorId:string,
-    firstCommitteeId:string,
-    secondCommitteeId:string
+export interface CreateMasterDto {
+    majorId: string,
+    studentId: string,
+    firstCommitteeId: string,
+    secondCommitteeId: string
 }

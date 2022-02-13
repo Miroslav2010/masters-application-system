@@ -7,6 +7,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.dto.response.*;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +47,7 @@ public class MasterController {
 
     @PostMapping
     public Process createMaster(@RequestBody MasterCreateDTO masterCreateDTO) {
-        return masterManagementService.createMaster(masterCreateDTO.getMentorId(), masterCreateDTO.getFirstCommitteeId(),
+        return masterManagementService.createMaster(masterCreateDTO.getStudentId(), masterCreateDTO.getFirstCommitteeId(),
                 masterCreateDTO.getSecondCommitteeId(), masterCreateDTO.getMajorId());
     }
 
@@ -54,8 +55,6 @@ public class MasterController {
     public MasterTopic createMasterTopic(@PathVariable String processId, @RequestParam String topic, @RequestParam String description,
                                          @RequestParam MultipartFile biography, @RequestParam MultipartFile mentorApproval, @RequestParam MultipartFile application,
                                          @RequestParam MultipartFile supplement) throws IOException {
-        if(topic.equals(""))
-            throw new RuntimeException();
         return masterManagementService.createMasterTopic(processId, topic, description, biography, mentorApproval,
                 application, supplement);
     }
@@ -72,8 +71,8 @@ public class MasterController {
 
     @PostMapping("/{processId}/draft")
     public Attachment uploadDraft(@PathVariable String processId, @RequestParam MultipartFile draft) throws IOException {
-        MockMultipartFile draftt = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "some draft".getBytes());
-        Attachment attachment = masterManagementService.uploadDraft(processId, draftt);
+//        MockMultipartFile draftt = new MockMultipartFile("draft", "draft.pdf", "application/pdf", "some draft".getBytes());
+        Attachment attachment = masterManagementService.uploadDraft(processId, draft);
         confirmUpload(processId);
         return attachment;
     }
@@ -83,8 +82,8 @@ public class MasterController {
         return masterManagementService.confirmUpload(processId);
     }
 
-    @PostMapping("/cancel-revision")
-    public Process cancelTheRevisionLoop(@RequestParam String processId) {
+    @PostMapping("/{processId}/cancel-revision")
+    public Process cancelTheRevisionLoop(@PathVariable String processId) {
         return masterManagementService.cancelRevisionLoop(processId);
     }
 
@@ -96,8 +95,8 @@ public class MasterController {
     }
 
     @GetMapping("/all")
-    public List<MasterPreviewDTO> getAllMasters() {
-        return masterManagementService.getAllMasters();
+    public MasterPreviewListDTO getAllMasters(Pageable pageable, @RequestParam( defaultValue = "") String filter) {
+        return masterManagementService.getAllMasters(pageable, filter);
     }
 
     @GetMapping("/{processId}/all-steps")
@@ -105,9 +104,9 @@ public class MasterController {
         return masterManagementService.getAllFinishedSteps(processId);
     }
 
-    @GetMapping("/{processId}/student")
-    public Student getStudent(@PathVariable String processId) {
-        return masterManagementService.getStudent(processId);
+    @GetMapping("/{processId}/studentMentor")
+    public StudentMentorDTO getStudent(@PathVariable String processId) {
+        return masterManagementService.getStudentAndMentor(processId);
     }
 
     @GetMapping("/{processId}/current-step")

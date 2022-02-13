@@ -55,7 +55,6 @@ public class RemarkServiceImpl implements RemarkService {
         //can make remark
         Person person = personService.getLoggedInUser();
         permissionService.canPersonWriteRemark(processId, person.getId());
-        Step currentStep = stepService.getActiveStep(processId);
         Remark remark = findById(remarkId);
         remark.setRemark(remarkMessage);
         remark.setDateTime(OffsetDateTime.now());
@@ -93,7 +92,7 @@ public class RemarkServiceImpl implements RemarkService {
     public Remark deleteById(String remarkId) {
         Person loggedInPerson = personService.getLoggedInUser();
         Remark remark = remarkRepository.getById(remarkId);
-        if (remark.getPerson().getId().equals(loggedInPerson.getId()))
+        if (!remark.getPerson().getId().equals(loggedInPerson.getId()))
             throw new RuntimeException("User tried to delete a remark that is not created by him.");
         remarkRepository.deleteById(remarkId);
         return remark;

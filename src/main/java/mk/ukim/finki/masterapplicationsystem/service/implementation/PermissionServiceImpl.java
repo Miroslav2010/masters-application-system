@@ -6,10 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.permissions.Permission;
 import mk.ukim.finki.masterapplicationsystem.repository.PermissionRepository;
-import mk.ukim.finki.masterapplicationsystem.service.MasterService;
-import mk.ukim.finki.masterapplicationsystem.service.PermissionService;
-import mk.ukim.finki.masterapplicationsystem.service.PersonService;
-import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
+import mk.ukim.finki.masterapplicationsystem.service.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,12 +20,14 @@ public class PermissionServiceImpl implements PermissionService {
     private final MasterService masterService;
     private final ProcessService processService;
     private final PersonService personService;
+    private final StepService stepService;
 
-    public PermissionServiceImpl(PermissionRepository permissionRepository, MasterService masterService, ProcessService processService, PersonService personService) {
+    public PermissionServiceImpl(PermissionRepository permissionRepository, MasterService masterService, ProcessService processService, PersonService personService, StepService stepService) {
         this.permissionRepository = permissionRepository;
         this.masterService = masterService;
         this.processService = processService;
         this.personService = personService;
+        this.stepService = stepService;
     }
 
     private List<ProcessState> getAvailableStatesForRole(Role role) {
@@ -79,12 +78,12 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public void canPersonCreateMaster(String personId) {
+    public void canPersonCreateMaster(String mentorId, String studentId) {
         //when a student can create new master (if one already exist) and can other authority create master
-        checkIfPersonHaveRole(personId, Role.STUDENT);
-        Boolean studentHaveActiveMaster = masterService.doesStudentHaveActiveMaster(personId);
+        checkIfPersonHaveRole(mentorId, Role.PROFESSOR);
+        Boolean studentHaveActiveMaster = masterService.doesStudentHaveActiveMaster(studentId);
         if (studentHaveActiveMaster)
-            throw new RuntimeException(String.format("Student with id: %s has already an active master.", personId));
+            throw new RuntimeException(String.format("Student with id: %s has already an active master.", studentId));
     }
 
     @Override
@@ -159,9 +158,16 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public void canPersonCancelRevisionLoop(String processId, String personId) {
         ProcessState processState = processService.getProcessState(processId);
-        if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, STUDENT_CHANGES_DRAFT).contains(processState)) {
+        if (processState == STUDENT_CHANGES_DRAFT) {
             checkIfPersonHaveRole(personId, Role.PROFESSOR);
             checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.PROFESSOR);
+        } else if (processState == DRAFT_COMMITTEE_REVIEW) {
+            if(stepService.doesStepExist(processId, STUDENT_CHANGES_DRAFT.toString())){
+                checkIfPersonHaveRole(personId, Role.PROFESSOR);
+                checkIfPersonIsAssignedOnMasterAsRole(processId, personId, Role.PROFESSOR);
+            }
+            else
+                throw new RuntimeException(String.format("Tried to cancel the revision in step %s that is not revision or change draft.", processState));
         }
         else
             throw new RuntimeException(String.format("Tried to cancel the revision in step %s that is not revision or change draft.", processState));

@@ -36,8 +36,8 @@ const masterService = {
         }).then(result => result.data);
     },
 
-    getAllMasters: () => {
-        return instance.get(`/api/master/all`)
+    getAllMasters: (page: number, size: number, filter: string) => {
+        return instance.get(`/api/master/all?page=${page}&size=${size}&filter=${filter}`)
             .then(result => result.data);
     },
 
@@ -46,8 +46,8 @@ const masterService = {
             .then(result => result.data);
     },
 
-    getStudent: (processId: string) => {
-        return instance.get(`/api/master/${processId}/student`)
+    getStudentAndMentor: (processId: string) => {
+        return instance.get(`/api/master/${processId}/studentMentor`)
             .then(result => result.data);
     },
 
@@ -63,6 +63,11 @@ const masterService = {
 
     getCurrentStepInfo: (processId: string) => {
         return instance.get(`/api/master/${processId}/current-step`)
+            .then(result => result.data);
+    },
+
+    cancelChangeLoop: (processId: string) => {
+        return instance.post(`/api/master/${processId}/cancel-revision`)
             .then(result => result.data);
     },
 

@@ -1,4 +1,6 @@
-export interface PersonDto{
-    id:string,
-    fullName:string
+export interface PersonDto {
+
+    id: string,
+    fullName: string
+
 }
