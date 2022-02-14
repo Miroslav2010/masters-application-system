@@ -91,7 +91,8 @@ class ValidationPage extends React.Component<Props, State> {
                                     <span key={index} className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
                                         {value.name}
                                         <FileOpenIcon fontSize='medium' color="secondary" sx={{ marginLeft: '3px' }}/>
-                                        <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + value} >
+                                        <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}
+                                                    href={"http://localhost:8080/api/document?documentId=" + value.id + "&fileLocation=" + value.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large'/>
                                         </IconButton>
                                     </span>

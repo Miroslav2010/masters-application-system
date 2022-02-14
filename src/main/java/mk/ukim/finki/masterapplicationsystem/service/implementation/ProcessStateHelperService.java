@@ -30,7 +30,7 @@ public class ProcessStateHelperService {
         put("Finished", EnumSet.of(APPLICATION_FINISHED, FINISHED));
     }};
 
-    public ProcessStateHelperService(ProcessService processService) {
+    public ProcessStateHelperService(ProcessService processService, PersonService personService) {
         this.processService = processService;
         this.personService = personService;
     }

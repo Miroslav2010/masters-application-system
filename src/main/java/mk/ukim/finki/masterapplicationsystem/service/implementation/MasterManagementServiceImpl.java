@@ -349,15 +349,20 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         List<DocumentDTO> documentLocations = new ArrayList<>();
         if (draftState == DOCUMENT_APPLICATION) {
             MasterTopic masterTopic = stepService.getMasterTopicFromProcess(processId);
-            documentLocations.add(new DocumentDTO(masterTopic.getApplication().getName(),masterTopic.getApplication().getLocation()));
-            documentLocations.add(new DocumentDTO(masterTopic.getBiography().getName(),masterTopic.getBiography().getLocation()));
-            documentLocations.add(new DocumentDTO(masterTopic.getMentorApproval().getName(),masterTopic.getMentorApproval().getLocation()));
-            documentLocations.add(new DocumentDTO(masterTopic.getSupplement().getName(),masterTopic.getSupplement().getLocation()));
+            Document application = masterTopic.getApplication();
+            documentLocations.add(new DocumentDTO(application.getId(), application.getName(), application.getLocation()));
+            Document biography = masterTopic.getBiography();
+            documentLocations.add(new DocumentDTO(biography.getId(), biography.getName(), biography.getLocation()));
+            Document mentorApproval = masterTopic.getMentorApproval();
+            documentLocations.add(new DocumentDTO(mentorApproval.getId(), mentorApproval.getName(), mentorApproval.getLocation()));
+            Document supplement = masterTopic.getSupplement();
+            documentLocations.add(new DocumentDTO(supplement.getId(), supplement.getName(), supplement.getLocation()));
         }
         //TODO: take from student draft if there is not student changes draft
         else if (EnumSet.of(STUDENT_DRAFT, MENTOR_REPORT).contains(draftState)) {
             Attachment attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
-            documentLocations.add(new DocumentDTO(attachment.getDocument().getName(),attachment.getDocument().getLocation()));
+            Document document = attachment.getDocument();
+            documentLocations.add(new DocumentDTO(document.getId(), document.getName(),document.getLocation()));
         }
         else if (draftState == STUDENT_CHANGES_DRAFT) {
             // when should be STUDENT_CHANGES_DRAFT and when MENTOR_REVIEW
@@ -366,7 +371,8 @@ public class MasterManagementServiceImpl implements MasterManagementService {
                 attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
             else
                 attachment = stepService.getAttachmentFromProcess(processId, STUDENT_DRAFT.toString());
-            documentLocations.add(new DocumentDTO(attachment.getDocument().getName(),attachment.getDocument().getLocation()));
+            Document document = attachment.getDocument();
+            documentLocations.add(new DocumentDTO(document.getId(), document.getName(), document.getLocation()));
         }
         return documentLocations;
     }

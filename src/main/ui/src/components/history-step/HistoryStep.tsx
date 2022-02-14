@@ -58,45 +58,53 @@ const HistoryStep = (props: Props) => {
                     <Typography variant="body2" color="text.secondary" className={ `${styles.wordBreakFileName}` } sx={{fontSize: 18, marginTop: '30px', display: 'flex', wordBreak: 'break-all'}}>
                         {props.historyStep?.application != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
-                                        {props.historyStep?.application.location}
+                                        {props.historyStep?.application.name}
                                 <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
-                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.application.location} >
+                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}
+                                            href={"http://localhost:8080/api/document?documentId=" +
+                                            props.historyStep?.application.id + "&fileLocation=" + props.historyStep?.application.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
                         {props.historyStep?.biography != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
-                                        {props.historyStep?.biography.location}
+                                        {props.historyStep?.biography.name}
                                 <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
-                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.biography.location} >
+                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}
+                                            href={"http://localhost:8080/api/document?documentId=" +
+                                            props.historyStep?.biography.id + "&fileLocation=" + props.historyStep?.biography.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
                         {props.historyStep?.mentorApproval != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
-                                        {props.historyStep?.mentorApproval.location}
+                                        {props.historyStep?.mentorApproval.name}
                                 <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
-                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.mentorApproval.location} >
+                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }}
+                                            href={"http://localhost:8080/api/document?documentId=" +
+                                            props.historyStep?.mentorApproval.id + "&fileLocation=" + props.historyStep?.mentorApproval.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
                         {props.historyStep?.supplement != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
-                                        {props.historyStep?.supplement.location}
+                                        {props.historyStep?.supplement.name}
                                 <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
-                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.supplement.location} >
+                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?documentId=" +
+                                props.historyStep?.supplement.id + "&fileLocation=" + props.historyStep?.supplement.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
                             : ""}
                         {props.historyStep?.document != null ?
                             <span className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter} ${styles.wordBreakFileName}`}>
-                                        {props.historyStep?.document.location}
+                                        {props.historyStep?.document.name}
                                 <FileOpenIcon fontSize='medium' color="primary" sx={{ marginLeft: '3px' }}/>
-                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + props.historyStep?.document.location} >
+                                <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?documentId=" +
+                                props.historyStep?.document.id + "&fileLocation=" + props.historyStep?.document.location} >
                                             <DownloadForOfflineRoundedIcon fontSize='large' color="primary"/>
                                 </IconButton>
                             </span>
