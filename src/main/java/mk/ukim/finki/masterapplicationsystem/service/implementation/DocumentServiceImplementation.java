@@ -27,7 +27,7 @@ public class DocumentServiceImplementation implements DocumentService {
 
     private Document save(String userId, MultipartFile file, String subFolder) throws IOException {
         String fileLocation = fileRepository.save(userId, file, subFolder);
-        Document doc = new Document(OffsetDateTime.now(), fileLocation);
+        Document doc = new Document(OffsetDateTime.now(), fileLocation,file.getOriginalFilename());
         try {
             doc = documentRepository.save(doc);
         } catch (Exception e) {

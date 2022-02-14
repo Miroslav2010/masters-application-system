@@ -23,10 +23,11 @@ public class DocumentController {
     }
 
     @GetMapping
-    public ResponseEntity<Resource> downloadFile(@RequestParam String fileLocation) throws IOException {
+    public ResponseEntity<Resource> downloadFile(@RequestParam String documentId, @RequestParam String fileLocation) throws IOException {
         Resource downloadFile = documentService.findFileByLocation(fileLocation);
+        Document document = documentService.findDocumentById(documentId);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + downloadFile.getFile().getName() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + document.getName() + "\"")
                 .body(downloadFile);
     }
 

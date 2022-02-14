@@ -1,6 +1,6 @@
 import React, {FC} from "react";
 import AppBar from '@mui/material/AppBar';
-import {Button, Container, Toolbar, Typography} from "@mui/material";
+import {Box, Button, Container, Grid, Link, Toolbar, Typography} from "@mui/material";
 import logo from './images/logo.png';
 import {createStyles, makeStyles} from "@mui/styles";
 import Authentication from "./components/auth/Authentication";
@@ -51,6 +51,23 @@ export const PageLayout: FC = ({children}) => {
             <Container>
                 {children}
             </Container>
+            <footer style={{position: 'absolute',
+                bottom: '0',
+                width: '99.3%',
+                height: '2rem'}}>
+                <Box
+                    px={{ xs: 3, sm: 10 }}
+                    py={{ xs: 3, sm: 5 }}
+                    bgcolor="text.secondary"
+                    color="white"
+                >
+                    <Container maxWidth="lg">
+                        <Box textAlign="center">
+                            Finki UKIM MK &reg; {new Date().getFullYear()}
+                        </Box>
+                    </Container>
+                </Box>
+            </footer>
         </React.Fragment>
     );
 }
