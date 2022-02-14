@@ -11,6 +11,7 @@ import RemarkService from "../service/remarkService";
 import {RemarkDTO} from "../domain/remarkResponse";
 import styles from './ValidationPage.style.module.css'
 import FileOpenIcon from "@mui/icons-material/FileOpen";
+import {DocumentDto} from "../domain/DocumentDto";
 
 interface Props {
     params: string;
@@ -21,7 +22,7 @@ interface State {
     processId: string | undefined;
     stepName: string;
     studentName: string;
-    downloadFileUrls: string[];
+    downloadFileUrls: DocumentDto[];
     isDisabled: boolean;
     open: boolean;
     remark: string;
@@ -88,7 +89,7 @@ class ValidationPage extends React.Component<Props, State> {
                             <Typography variant="body2" color="text.secondary" sx={{fontSize: 18, marginTop: '30px', display: 'flex', wordBreak: 'break-all'}}>
                                 {this.state.downloadFileUrls.map((value, index) => (
                                     <span key={index} className={`${styles.flex} ${styles.marginRight15} ${styles.alignItemsCenter}`}>
-                                        {value}
+                                        {value.name}
                                         <FileOpenIcon fontSize='medium' color="secondary" sx={{ marginLeft: '3px' }}/>
                                         <IconButton sx={{ marginLeft: '5px',marginRight: '15px' }} href={"http://localhost:8080/api/document?fileLocation=" + value} >
                                             <DownloadForOfflineRoundedIcon fontSize='large'/>

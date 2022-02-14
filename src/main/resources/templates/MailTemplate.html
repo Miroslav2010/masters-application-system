@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:remove="all">Магистарски студии</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<p>
+    Здраво, <span th:text="${name}"></span>
+</p>
+<p>
+    Магистерската работа на студентот <span th:text="${student.fullName}"></span> со индекс <span th:text="${student.index}"></span>
+    е моментално во чекорот &quot;<span th:text="${processStep}"></span>&quot;. Ве молиме превземете соодветна акција.
+</p>
+<p>
+    Поздрав.
+</p>
+</body>
+</html>

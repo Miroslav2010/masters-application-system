@@ -34,10 +34,11 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     private final PermissionService permissionService;
     private final DocumentService documentService;
     private final ProcessStateHelperService processStateHelperService;
+    private final EmailService emailService;
 
     public MasterManagementServiceImpl(MasterService masterService, ProcessService processService, StepService stepService,
                                        PersonService personService, MajorService majorService, StepValidationService stepValidationService,
-                                       PermissionService permissionService, DocumentService documentService, ProcessStateHelperService processStateHelperService) {
+                                       PermissionService permissionService, DocumentService documentService, ProcessStateHelperService processStateHelperService, EmailService emailService) {
         this.masterService = masterService;
         this.processService = processService;
         this.stepService = stepService;
@@ -47,6 +48,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         this.permissionService = permissionService;
         this.documentService = documentService;
         this.processStateHelperService = processStateHelperService;
+        this.emailService = emailService;
     }
 
     private Professor findProfessorById(String id) {
@@ -64,6 +66,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
 
     private void setUpNewStep(String processId) {
         // if method is transactional this would not be the active process state
+        Process process = processService.findProcessById(processId);
         ProcessState processState = processService.getProcessState(processId);
         if (EnumSet.of(APPLICATION_FINISHED, FINISHED).contains(processState))
             return;
@@ -73,6 +76,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
                 setUpNewMasterTopic(processId);
         else
             setUpNewValidation(processId);
+        emailService.sendMailForProcess(process);
     }
 
     private void setUpNewMasterTopic(String processId) {
@@ -270,7 +274,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
         ProcessState state = processService.getProcessState(processId);
         Master master = processService.getProcessMaster(processId);
-        List<String> documentLocations = getDocumentLocations(processId);
+        List<DocumentDTO> documentLocations = getDocumentLocations(processId);
         return new ValidationResponseDTO(state.label, master.getStudent().getFullName(), documentLocations);
     }
 
@@ -339,21 +343,21 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         return new CurrentStepDTO(processState.toString(), personNames, assignedRole);
     }
 
-    private List<String> getDocumentLocations(String processId) {
+    private List<DocumentDTO> getDocumentLocations(String processId) {
         ProcessState processState = processService.getProcessState(processId);
         ProcessState draftState = firstStepFromPhase(processState);
-        List<String> documentLocations = new ArrayList<>();
+        List<DocumentDTO> documentLocations = new ArrayList<>();
         if (draftState == DOCUMENT_APPLICATION) {
             MasterTopic masterTopic = stepService.getMasterTopicFromProcess(processId);
-            documentLocations.add(masterTopic.getApplication().getLocation());
-            documentLocations.add(masterTopic.getBiography().getLocation());
-            documentLocations.add(masterTopic.getMentorApproval().getLocation());
-            documentLocations.add(masterTopic.getSupplement().getLocation());
+            documentLocations.add(new DocumentDTO(masterTopic.getApplication().getName(),masterTopic.getApplication().getLocation()));
+            documentLocations.add(new DocumentDTO(masterTopic.getBiography().getName(),masterTopic.getBiography().getLocation()));
+            documentLocations.add(new DocumentDTO(masterTopic.getMentorApproval().getName(),masterTopic.getMentorApproval().getLocation()));
+            documentLocations.add(new DocumentDTO(masterTopic.getSupplement().getName(),masterTopic.getSupplement().getLocation()));
         }
         //TODO: take from student draft if there is not student changes draft
         else if (EnumSet.of(STUDENT_DRAFT, MENTOR_REPORT).contains(draftState)) {
             Attachment attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
-            documentLocations.add(attachment.getDocument().getLocation());
+            documentLocations.add(new DocumentDTO(attachment.getDocument().getName(),attachment.getDocument().getLocation()));
         }
         else if (draftState == STUDENT_CHANGES_DRAFT) {
             // when should be STUDENT_CHANGES_DRAFT and when MENTOR_REVIEW
@@ -362,7 +366,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
                 attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
             else
                 attachment = stepService.getAttachmentFromProcess(processId, STUDENT_DRAFT.toString());
-            documentLocations.add(attachment.getDocument().getLocation());
+            documentLocations.add(new DocumentDTO(attachment.getDocument().getName(),attachment.getDocument().getLocation()));
         }
         return documentLocations;
     }

@@ -6,6 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDT
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewView;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
+import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import org.springframework.stereotype.Service;
 
@@ -17,19 +18,21 @@ import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessSt
 @Service
 public class ProcessStateHelperService {
     private final ProcessService processService;
+    private final PersonService personService;
 
     private final Map<String, Set<ProcessState>> typeStepMap = new HashMap<String, Set<ProcessState>>() {{
         put("MasterTopic", EnumSet.of(DOCUMENT_APPLICATION));
         put("Validation",
                 EnumSet.of(INITIAL_MENTOR_REVIEW, STUDENT_SERVICE_REVIEW, INITIAL_NNK_REVIEW, INITIAL_SECRETARY_REVIEW,
-                DRAFT_MENTOR_REVIEW, DRAFT_SECRETARY_REVIEW, DRAFT_NNK_REVIEW, SECOND_DRAFT_SECRETARY_REVIEW, DRAFT_COMMITTEE_REVIEW,
-                REPORT_REVIEW, REPORT_SECRETARY_REVIEW, REPORT_STUDENT_SERVICE));
+                        DRAFT_MENTOR_REVIEW, DRAFT_SECRETARY_REVIEW, DRAFT_NNK_REVIEW, SECOND_DRAFT_SECRETARY_REVIEW, DRAFT_COMMITTEE_REVIEW,
+                        REPORT_REVIEW, REPORT_SECRETARY_REVIEW, REPORT_STUDENT_SERVICE));
         put("Attachment", EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT, MENTOR_REPORT));
         put("Finished", EnumSet.of(APPLICATION_FINISHED, FINISHED));
     }};
 
     public ProcessStateHelperService(ProcessService processService) {
         this.processService = processService;
+        this.personService = personService;
     }
 
     public List<Person> getResponsiblePersonsForStep(String processId) {
@@ -43,6 +46,20 @@ public class ProcessStateHelperService {
         else if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, REPORT_REVIEW).contains(processState)) {
             responsiblePersons.add(master.getCommitteeFirst());
             responsiblePersons.add(master.getCommitteeSecond());
+        }
+        return responsiblePersons;
+    }
+    public List<Person> getEmailReceivers(String processId){
+        ProcessState processState = processService.getProcessState(processId);
+        List<Person> responsiblePersons = this.getResponsiblePersonsForStep(processId);
+        if (EnumSet.of(DRAFT_NNK_REVIEW,INITIAL_NNK_REVIEW).contains(processState))
+        {
+            responsiblePersons.addAll(personService.getAllNNKMembers());
+        }
+        else if (EnumSet.of(SECOND_DRAFT_SECRETARY_REVIEW,DRAFT_SECRETARY_REVIEW,REPORT_SECRETARY_REVIEW,INITIAL_SECRETARY_REVIEW).contains(processState)){
+            responsiblePersons.addAll(personService.getAllSecretaries());
+        } else if (EnumSet.of(STUDENT_SERVICE_REVIEW,REPORT_STUDENT_SERVICE).contains(processState)) {
+            responsiblePersons.addAll(personService.getStudentServiceMembers());
         }
         return responsiblePersons;
     }
