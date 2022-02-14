@@ -9,6 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class DocumentDTO {
 
+    private String id;
+
     private String name;
 
     private String location;

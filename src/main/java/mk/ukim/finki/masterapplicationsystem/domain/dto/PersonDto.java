@@ -13,4 +13,5 @@ public class PersonDto {
     private final List<Role> roles = new ArrayList<>();
     private String index;
     private String password;
+    private String email;
 }

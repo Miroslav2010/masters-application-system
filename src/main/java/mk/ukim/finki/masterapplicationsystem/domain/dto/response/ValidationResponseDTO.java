@@ -13,6 +13,6 @@ public class ValidationResponseDTO {
 
     private String studentName;
 
-    private List<String> downloadUrl;
+    private List<DocumentDTO> downloadUrl;
 
 }

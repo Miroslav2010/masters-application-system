@@ -1,4 +1,6 @@
 export interface DocumentDto {
+    id: string,
     dateUploaded: Date,
-    location: string
+    location: string,
+    name: string
 }
