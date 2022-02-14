@@ -4,6 +4,9 @@ import mk.ukim.finki.masterapplicationsystem.domain.Major;
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Professor;
 import mk.ukim.finki.masterapplicationsystem.domain.Student;
+import mk.ukim.finki.masterapplicationsystem.domain.view.MasterView;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -35,6 +38,8 @@ public interface MasterService {
     Master marMasterAsDefenced(String id, OffsetDateTime defencedDateTime);
 
     Master setArchiveNumber(String id, String archiveNumber);
+
+    Page<MasterView> findAllMastersPageable(String personId, String filter, Pageable pageable);
 
     Master setMajor(String id, Major major);
 

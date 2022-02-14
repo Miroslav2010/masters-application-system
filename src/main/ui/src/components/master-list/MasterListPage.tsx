@@ -151,11 +151,15 @@ interface Prop {
     loading: boolean;
     getMasters: Function,
     search: string,
+    orderBy: string,
+    order: string
 }
 
 export default function EnhancedTable(props: Prop) {
-    const [order, setOrder] = React.useState<Order>('desc');
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('lastModified');
+    const [order, setOrder] = React.useState<Order>((props.order === 'asc' || props.order === 'desc') ? props.order : 'desc' );
+    console.log(props.order, props.orderBy)
+    const [orderBy, setOrderBy] =
+            React.useState<keyof Data>((props.orderBy == 'student' || props.orderBy == 'mentor' || props.orderBy == 'step' || props.orderBy == 'lastModified') ? props.orderBy : 'lastModified');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const navigate = useNavigate();
@@ -171,7 +175,7 @@ export default function EnhancedTable(props: Prop) {
         console.log(searchValue);
         // Do fetch here...
         // Triggers when "debouncedValue" changes
-        props.getMasters(page, rowsPerPage, searchValue);
+        props.getMasters(page, rowsPerPage, searchValue, orderBy, order);
     }, [debouncedValue])
 
     const handleRequestSort = (
@@ -181,6 +185,7 @@ export default function EnhancedTable(props: Prop) {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
+        props.getMasters(page, rowsPerPage, searchValue, orderBy, order);
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, path: string) => {
@@ -191,14 +196,14 @@ export default function EnhancedTable(props: Prop) {
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
         console.log("change page :" + newPage + ", size " + rowsPerPage);
-        props.getMasters(newPage, rowsPerPage, searchValue);
+        props.getMasters(newPage, rowsPerPage, searchValue, orderBy, order);
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
         console.log("change page :" + page + ", size " + parseInt(event.target.value, 10));
-        props.getMasters(page, parseInt(event.target.value, 10), searchValue);
+        props.getMasters(page, parseInt(event.target.value, 10), searchValue, orderBy, order);
     };
 
     const canCreateMaster = () => {

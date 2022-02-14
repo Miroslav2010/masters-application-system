@@ -6,6 +6,7 @@ import mk.ukim.finki.masterapplicationsystem.domain.dto.response.*;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
+import mk.ukim.finki.masterapplicationsystem.domain.view.MasterView;
 import mk.ukim.finki.masterapplicationsystem.service.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -286,12 +287,12 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Override
     public MasterPreviewListDTO getAllMasters(Pageable pageable, String filter) {
         Person person = personService.getLoggedInUser();
-        Page<MasterPreviewView> masterPage = null;
+        Page<MasterView> masterPage = null;
         if (person.getRoles().contains(Role.STUDENT_SERVICE) || person.getRoles().contains(Role.SECRETARY)
                 || person.getRoles().contains(Role.NNK))
-            masterPage = processService.findAllView("%", filter, pageable);
+            masterPage = masterService.findAllMastersPageable("%", filter, pageable);
         else
-            masterPage = processService.findAllView(person.getId(), filter, pageable);
+            masterPage = masterService.findAllMastersPageable(person.getId(), filter, pageable);
         List<MasterPreviewDTO> masters = new ArrayList<>();
         masterPage.getContent().forEach(s -> masters.add(processStateHelperService.convertToMasterPreview(s)));
         return new MasterPreviewListDTO(masters, masterPage.getTotalElements());

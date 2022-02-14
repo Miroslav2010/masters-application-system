@@ -3,7 +3,6 @@ import {PageLayout} from "../../PageLayout";
 import {MasterPreviewDto} from "../../domain/masterPreviewDto";
 import masterService from "../../service/masterService";
 import EnhancedTable from "./MasterListPage";
-import {MasterPreviewListDto} from "../../domain/MasterPreviewListDto";
 
 interface Props {
     // params: string;
@@ -14,6 +13,8 @@ interface State {
     totalNumberMasters: number;
     loading: boolean;
     searchValue: string;
+    orderBy: string;
+    order: string;
 }
 
 class MasterWrap extends React.Component<Props, State> {
@@ -25,28 +26,32 @@ class MasterWrap extends React.Component<Props, State> {
             masters: [],
             loading: true,
             totalNumberMasters: 0,
-            searchValue: ''
+            searchValue: '',
+            orderBy: 'lastModified',
+            order: 'desc'
         }
     }
 
 
     componentDidMount() {
         console.log("did mount");
-        this.getMasters(0, 5, "");
+        this.getMasters(0, 5, "", "lastModified", "desc");
     }
 
-    getMasters = (page: number, size: number, filter: string) => {
+    getMasters = (page: number, size: number, filter: string, orderBy: string, order: string) => {
         this.setState({
         loading: true
         });
-        masterService.getAllMasters(page, size, filter)
+        masterService.getAllMasters(page, size, filter, orderBy, order)
             .then(masters => {
                 console.log(masters);
                 this.setState({
                     masters: masters.masterPreviews,
                     totalNumberMasters: masters.mastersNumber,
                     loading: false,
-                    searchValue: filter
+                    searchValue: filter,
+                    orderBy: orderBy,
+                    order: order
                 })
             });
     }
@@ -55,7 +60,8 @@ class MasterWrap extends React.Component<Props, State> {
         return (
             <PageLayout>
                 <EnhancedTable masters={this.state.masters} loading={this.state.loading} getMasters={this.getMasters}
-                               mastersNumber={this.state.totalNumberMasters} search={ this.state.searchValue } />
+                               mastersNumber={this.state.totalNumberMasters} search={ this.state.searchValue }
+                               orderBy={this.state.orderBy} order={this.state.order} />
             </PageLayout>
         )
     }
