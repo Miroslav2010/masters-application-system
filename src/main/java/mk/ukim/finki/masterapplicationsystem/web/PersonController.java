@@ -48,6 +48,7 @@ public class PersonController {
 
     @PostMapping
     public ResponseEntity<Void> createPerson(@RequestBody PersonDto person) {
+        person.setEmail("vtest7305@gmail.com");
         Person result = this.personService.createPerson(person);
         if (result != null) {
             return ResponseEntity.noContent().build();

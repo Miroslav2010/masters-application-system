@@ -20,6 +20,8 @@ public class Person implements UserDetails {
 
     private String password;
 
+    private String email;
+
     @ElementCollection(targetClass= Role.class, fetch = EAGER)
     @Enumerated(EnumType.STRING)
     private final List<Role> roles = new ArrayList<>();

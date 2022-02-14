@@ -3,6 +3,7 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
+import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +17,11 @@ import static mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessSt
 @Service
 public class ProcessStateHelperService {
     private final ProcessService processService;
+    private final PersonService personService;
 
-    public ProcessStateHelperService(ProcessService processService) {
+    public ProcessStateHelperService(ProcessService processService, PersonService personService) {
         this.processService = processService;
+        this.personService = personService;
     }
 
     public List<Person> getResponsiblePersonsForStep(String processId) {
@@ -32,6 +35,20 @@ public class ProcessStateHelperService {
         else if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, REPORT_REVIEW).contains(processState)) {
             responsiblePersons.add(master.getCommitteeFirst());
             responsiblePersons.add(master.getCommitteeSecond());
+        }
+        return responsiblePersons;
+    }
+    public List<Person> getEmailReceivers(String processId){
+        ProcessState processState = processService.getProcessState(processId);
+        List<Person> responsiblePersons = this.getResponsiblePersonsForStep(processId);
+        if (EnumSet.of(DRAFT_NNK_REVIEW,INITIAL_NNK_REVIEW).contains(processState))
+        {
+            responsiblePersons.addAll(personService.getAllNNKMembers());
+        }
+        else if (EnumSet.of(SECOND_DRAFT_SECRETARY_REVIEW,DRAFT_SECRETARY_REVIEW,REPORT_SECRETARY_REVIEW,INITIAL_SECRETARY_REVIEW).contains(processState)){
+            responsiblePersons.addAll(personService.getAllSecretaries());
+        } else if (EnumSet.of(STUDENT_SERVICE_REVIEW,REPORT_STUDENT_SERVICE).contains(processState)) {
+            responsiblePersons.addAll(personService.getStudentServiceMembers());
         }
         return responsiblePersons;
     }

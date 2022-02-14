@@ -61,4 +61,19 @@ public class PersonServiceImpl implements PersonService {
     public Person getLoggedInUser() {
         return (Person) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
+    @Override
+    public List<Person> getStudentServiceMembers() {
+        return personRepository.findAllByRolesContaining(Role.STUDENT_SERVICE);
+    }
+
+    @Override
+    public List<Person> getAllSecretaries() {
+        return personRepository.findAllByRolesContaining(Role.SECRETARY);
+    }
+
+    @Override
+    public List<Person> getAllNNKMembers() {
+        return personRepository.findAllByRolesContaining(Role.NNK);
+    }
 }

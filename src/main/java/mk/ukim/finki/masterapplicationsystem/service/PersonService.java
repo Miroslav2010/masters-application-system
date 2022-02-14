@@ -17,4 +17,8 @@ public interface PersonService {
     Person createPerson(PersonDto person);
 
     Person getLoggedInUser();
+
+    List<Person> getStudentServiceMembers();
+    List<Person> getAllSecretaries();
+    List<Person> getAllNNKMembers();
 }
