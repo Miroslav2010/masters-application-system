@@ -2,14 +2,15 @@ package mk.ukim.finki.masterapplicationsystem.web;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
 import mk.ukim.finki.masterapplicationsystem.domain.*;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.request.*;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.request.ArchiveNumberDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.request.MasterCreateDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.request.ValidationStepDTO;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.*;
 import mk.ukim.finki.masterapplicationsystem.service.MajorService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterManagementService;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -104,9 +105,9 @@ public class MasterController {
         return masterManagementService.getAllFinishedSteps(processId);
     }
 
-    @GetMapping("/{processId}/studentMentor")
-    public StudentMentorDTO getStudent(@PathVariable String processId) {
-        return masterManagementService.getStudentAndMentor(processId);
+    @GetMapping("/{processId}/masterInfo")
+    public MasterBasicInfoDTO getStudent(@PathVariable String processId) {
+        return masterManagementService.getMasterBasicInfo(processId);
     }
 
     @GetMapping("/{processId}/current-step")

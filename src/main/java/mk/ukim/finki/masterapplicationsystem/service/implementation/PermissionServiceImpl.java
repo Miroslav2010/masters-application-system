@@ -174,6 +174,14 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
+    public void canPersonSetArchiveNumber(String processId, String personId) {
+        ProcessState processState = processService.getProcessState(processId);
+        checkIfPersonHaveRole(personId, Role.SECRETARY);
+        if (processState.ordinal() < INITIAL_SECRETARY_REVIEW.ordinal())
+            throw new RuntimeException(String.format("Not allowed to set archive number in state: %s.", processState.toString()));
+    }
+
+    @Override
     public void canPersonUploadAttachment(String processId, String personId) {
         ProcessState processState = processService.getProcessState(processId);
         if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState)) {

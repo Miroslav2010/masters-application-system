@@ -33,6 +33,8 @@ import RuleIcon from '@mui/icons-material/Rule';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import HowToRegOutlinedIcon from '@mui/icons-material/HowToRegOutlined';
 import {PersonDto} from "../../domain/PersonDto";
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import ArchiveNumberDialog from "../../dialog/ArchiveNumberDialog";
 
 const drawerWidth = 400;
 
@@ -45,6 +47,7 @@ interface Props {
     historyStep: StepHistoryDto | undefined,
     student: StudentDto | undefined,
     mentor: PersonDto | undefined,
+    archiveNumber: string | null,
     remarks: RemarkDTO[],
     validations: StepValidationDto[],
     newData: boolean
@@ -55,6 +58,7 @@ export default function MasterDetails(props: Props) {
     // console.log(props);
     const [currentStepActive, setCurrentStepActive] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     // console.log(loading);
     const navigate = useNavigate();
     const goBack = () => {
@@ -93,8 +97,31 @@ export default function MasterDetails(props: Props) {
             .then(_ => window.location.reload());
     }
 
-    const showMasterManageButtons = () => {
+    const showSetArchiveNumber = () => {
+        if (props.student == undefined)
+            return false;
+        console.log(props.archiveNumber);
+        let loggedInUser = personService.getLoggedInUser();
+        if (loggedInUser == "")
+            return false;
+        console.log(props.currentStep?.assignedRole);
+        console.log(loggedInUser);
+        return loggedInUser["roles"][0] == "SECRETARY" && props.archiveNumber == null &&
+            (props.currentStep?.processState != "DOCUMENT_APPLICATION" && props.currentStep?.processState != "INITIAL_MENTOR_REVIEW"
+                && props.currentStep?.processState != "STUDENT_SERVICE_REVIEW" && props.currentStep?.processState != "INITIAL_NNK_REVIEW");
+    }
 
+    const setArchiveNumber = (archiveNumber: string | undefined) => {
+        if(archiveNumber == undefined){
+            setOpenDialog(false);
+            return;
+        }
+        console.log(archiveNumber);
+        masterService.setArchiveNumber(props.processId, archiveNumber)
+            .then(_ => {
+                setOpenDialog(false);
+                window.location.reload();
+            })
     }
 
     return (
@@ -142,6 +169,12 @@ export default function MasterDetails(props: Props) {
                             backgroundColor: 'darkred'}} onClick={() => cancelChangeLoop()}
                         >
                             Прекини промени
+                        </Button>}
+                        {showSetArchiveNumber() &&
+                        <Button variant="contained" color="secondary" endIcon={<NoteAddIcon />} sx={{width: '50%', marginLeft: '10px'}}
+                                onClick={() => setOpenDialog(true)}
+                        >
+                            Aрхивски број
                         </Button>}
                     </div>
                     <Divider/>
@@ -196,6 +229,7 @@ export default function MasterDetails(props: Props) {
                     : props.historyStep != undefined &&
                     <HistoryStep historyStep={props.historyStep} remarks={props.remarks} validations={props.validations} />}
 
+                <ArchiveNumberDialog open={openDialog} onClose={setArchiveNumber} />
             </Box>
     );
 }
