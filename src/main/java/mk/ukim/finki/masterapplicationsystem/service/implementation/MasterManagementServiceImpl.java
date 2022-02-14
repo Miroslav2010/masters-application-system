@@ -7,6 +7,8 @@ import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ValidationStatus;
 import mk.ukim.finki.masterapplicationsystem.service.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +16,7 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -107,10 +110,10 @@ public class MasterManagementServiceImpl implements MasterManagementService {
 
     @Transactional
     @Override
-    public Process createMaster(String mentorId, String firstCommitteeId, String secondCommitteeId, String majorId) {
-        Student student = (Student) personService.getLoggedInUser();
-        permissionService.canPersonCreateMaster(student.getId());
-        Professor mentor = findProfessorById(mentorId);
+    public Process createMaster(String studentId, String firstCommitteeId, String secondCommitteeId, String majorId) {
+        Professor mentor = (Professor) personService.getLoggedInUser();
+        permissionService.canPersonCreateMaster(mentor.getId(), studentId);
+        Student student = (Student) personService.getPerson(studentId);
         Professor firstCommittee = findProfessorById(firstCommitteeId);
         Professor secondCommittee = findProfessorById(secondCommitteeId);
         Major major = majorService.findMajorById(majorId);
@@ -140,8 +143,10 @@ public class MasterManagementServiceImpl implements MasterManagementService {
             return DOCUMENT_APPLICATION;
         else if (processState.ordinal() <= SECOND_DRAFT_SECRETARY_REVIEW.ordinal())
             return STUDENT_DRAFT;
-        else
+        else if (processState.ordinal() <= STUDENT_CHANGES_DRAFT.ordinal())
             return STUDENT_CHANGES_DRAFT;
+        else
+            return MENTOR_REPORT;
     }
 
     private void checkIfPersonAlreadyValidated(Step step, String personId) {
@@ -186,6 +191,34 @@ public class MasterManagementServiceImpl implements MasterManagementService {
 
     @Transactional
     @Override
+    public void schedulerValidateStep(String processId, ValidationStatus validationStatus) {
+        Step step = stepService.getActiveStep(processId);
+        List<Person> persons = processStateHelperService.getResponsiblePersonsForStep(processId);
+        if (persons.size() == 0) {
+            try {
+                Person person = personService.getSystemUser();
+                stepValidationService.changeStepValidationStatus(step, person, validationStatus);
+            }
+            catch (Exception e){
+
+            }
+        }
+        else
+            persons.stream().filter(person -> stepValidationService
+                    .findValidationStatusByStepIdAndPersonId(step.getId(), person.getId()) == ValidationStatus.WAITING)
+                    .forEach(person -> stepValidationService.changeStepValidationStatus(step, person, validationStatus));
+        if (!allAssignedValidated(step))
+            return;
+        if (checkIfSomeoneRefused(step)) {
+            processService.goToStep(processId, firstStepFromPhase(processService.getProcessState(processId)));
+        }
+        else
+            processNextState(processId);
+        setUpNewStep(processId);
+    }
+
+    @Transactional
+    @Override
     public Master setArchiveNumber(String processId, String archiveNumber) {
         Master master = processService.getProcessMaster(processId);
         return masterService.setArchiveNumber(master.getId(), archiveNumber);
@@ -206,7 +239,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         isCancelingRevisionLoop(processId, loggedInUser);
         permissionService.canPersonUploadAttachment(processId, loggedInUser.getId());
         ProcessState processState = processService.getProcessState(processId);
-        return stepService.editAttachment(processId, processState, loggedInUser.getId(), processState.toString(), draft);
+        return stepService.editAttachment(processId, processState, processState.toString(), draft);
     }
 
     @Transactional
@@ -250,17 +283,17 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     @Override
-    public List<MasterPreviewDTO> getAllMasters() {
+    public MasterPreviewListDTO getAllMasters(Pageable pageable, String filter) {
         Person person = personService.getLoggedInUser();
-        List<Process> processes = new ArrayList<>();
+        Page<MasterPreviewView> masterPage = null;
         if (person.getRoles().contains(Role.STUDENT_SERVICE) || person.getRoles().contains(Role.SECRETARY)
                 || person.getRoles().contains(Role.NNK))
-            processes.addAll(processService.findAll());
+            masterPage = processService.findAllView("%", filter, pageable);
         else
-            processes.addAll(processService.findAllByPersonAssigned(person.getId()));
+            masterPage = processService.findAllView(person.getId(), filter, pageable);
         List<MasterPreviewDTO> masters = new ArrayList<>();
-        processes.forEach(s -> masters.add(getMasterDetails(s)));
-        return masters;
+        masterPage.getContent().forEach(s -> masters.add(processStateHelperService.convertToMasterPreview(s)));
+        return new MasterPreviewListDTO(masters, masterPage.getTotalElements());
     }
 
     @Override
@@ -272,16 +305,18 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         ProcessState processState = processService.getProcessState(processId);
         String typeOfStep = processStateHelperService.getTypeOfStep(processState);
         List<StepPreviewItem> steps = new ArrayList<>();
-        stepService.findAllLastInstanceSteps(processId).forEach(s -> steps.add(new StepPreviewItem(s.getId(), s.getName(), typeOfStep)));
+        stepService.findAllLastInstanceSteps(processId).forEach(s -> steps.add(new StepPreviewItem(s.getId(), s.getName(),
+                processStateHelperService.getTypeOfStep(ProcessState.valueOf(s.getName())))));
         StepPreviewDTO stepPreviewDTO = new StepPreviewDTO(typeOfStep, steps);
         return stepPreviewDTO;
     }
 
     @Override
-    public Student getStudent(String processId) {
+    public StudentMentorDTO getStudentAndMentor(String processId) {
         Person loggedInUser = personService.getLoggedInUser();
         permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
-        return processService.getProcessMaster(processId).getStudent();
+        Master master = processService.getProcessMaster(processId);
+        return new StudentMentorDTO(master.getStudent(), master.getMentor());
     }
 
     @Override
@@ -289,7 +324,19 @@ public class MasterManagementServiceImpl implements MasterManagementService {
         Person loggedInUser = personService.getLoggedInUser();
         permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
         ProcessState processState = processService.getProcessState(processId);
-        return new CurrentStepDTO(processState.toString(), loggedInUser.getRoles().get(0).toString());
+        List<Person> persons = processStateHelperService.getResponsiblePersonsForStep(processId);
+        List<String> personNames = new ArrayList<>();
+        if (EnumSet.of(DRAFT_COMMITTEE_REVIEW, REPORT_REVIEW).contains(processState)) {
+            Step currentStep = stepService.getActiveStep(processId);
+            personNames.addAll(
+                    persons.stream().filter(person ->
+                    stepValidationService.findValidationStatusByStepIdAndPersonId(currentStep.getId(), person.getId()) == ValidationStatus.WAITING)
+                    .map(Person::getUsername).collect(Collectors.toList()));
+        }
+        else
+            personNames.addAll(persons.stream().map(Person::getUsername).collect(Collectors.toList()));
+        String assignedRole = processStateHelperService.getAssignedRolesForStep(processId);
+        return new CurrentStepDTO(processState.toString(), personNames, assignedRole);
     }
 
     private List<String> getDocumentLocations(String processId) {
@@ -304,7 +351,7 @@ public class MasterManagementServiceImpl implements MasterManagementService {
             documentLocations.add(masterTopic.getSupplement().getLocation());
         }
         //TODO: take from student draft if there is not student changes draft
-        else if (draftState == STUDENT_DRAFT) {
+        else if (EnumSet.of(STUDENT_DRAFT, MENTOR_REPORT).contains(draftState)) {
             Attachment attachment = stepService.getAttachmentFromProcess(processId, draftState.toString());
             documentLocations.add(attachment.getDocument().getLocation());
         }

@@ -22,6 +22,9 @@ import masterService from "../../service/masterService";
 import styles from "../ValidationPage.style.module.css";
 import {PageLayout} from "../../PageLayout";
 import {NavigateFunction, useNavigate} from "react-router-dom";
+import {StudentDto} from "../../domain/StudentDto";
+import Autocomplete from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 interface IProps {
     navigation: NavigateFunction
@@ -29,11 +32,13 @@ interface IProps {
 
 interface IState {
     professors: PersonDto[];
+    students: StudentDto[];
     majors: MajorDto[];
     majorId: string;
-    mentorId: string;
+    studentId: string;
     firstCommittee: string;
     secondCommittee: string;
+    isDisabled: boolean;
 }
 
 const MenuProps = {
@@ -51,17 +56,22 @@ class MasterTopic extends React.Component<IProps, IState> {
         console.log(props);
         this.state = {
             professors: [],
+            students: [],
             majors: [],
             majorId: "",
-            mentorId: "",
+            studentId: "",
             firstCommittee: "",
-            secondCommittee: ""
+            secondCommittee: "",
+            isDisabled: false
         }
     }
 
     componentDidMount() {
         personService.fetchProfessors((data) => {
             this.setState({professors: data})
+        })
+        personService.fetchStudents((data) => {
+            this.setState({students: data})
         })
         masterService.getAllMajors((data) => {
             this.setState({majors: data})
@@ -72,54 +82,53 @@ class MasterTopic extends React.Component<IProps, IState> {
 
     }
 
-    setMajor(event: SelectChangeEvent<string>) {
-        const {
-            target: {value},
-        } = event;
+    setMajor(value: string | undefined) {
+        let selectedMajor = value == undefined ? "" : value;
+        console.log(selectedMajor);
         this.setState({
-            majorId: value
-        })
+            majorId: selectedMajor
+        });
     }
 
-    setMentor(event: SelectChangeEvent<string>) {
-        const {
-            target: {value},
-        } = event;
+    setStudent(value: string | undefined) {
+        let selectedStudent = value == undefined ? "" : value;
+        console.log(selectedStudent);
         this.setState({
-            mentorId: value
-        })
+            studentId: selectedStudent
+        });
     }
 
-    setCommitteeFirst(event: SelectChangeEvent<string>) {
-        const {
-            target: {value},
-        } = event;
+    setCommitteeFirst(value: string | undefined) {
+        let selectedProfessor = value == undefined ? "" : value;
+        console.log(selectedProfessor);
         this.setState({
-            firstCommittee: value
-        })
+            firstCommittee: selectedProfessor
+        });
     }
 
-    setCommitteeSecond(event: SelectChangeEvent<string>) {
-        const {
-            target: {value},
-        } = event;
+    setCommitteeSecond(value: string | undefined) {
+        let selectedProfessor = value == undefined ? "" : value;
+        console.log(selectedProfessor);
         this.setState({
-            secondCommittee: value
-        })
+            secondCommittee: selectedProfessor
+        });
     }
 
     handleSubmit() {
+        this.setState({
+            isDisabled: true
+        })
         masterService.createMaster({
             majorId: this.state.majorId,
-            mentorId: this.state.mentorId,
+            studentId: this.state.studentId,
             firstCommitteeId: this.state.firstCommittee,
             secondCommitteeId: this.state.secondCommittee
         }).then(res => this.props.navigation("/masters"));
     }
 
     updateIsDisabled() {
-        return this.state.majorId == "" || this.state.mentorId == "" || this.state.firstCommittee == "" ||
-            this.state.secondCommittee == "";
+        return (this.state.majorId == "" || this.state.studentId == "" || this.state.firstCommittee == "" ||
+            this.state.secondCommittee == "") ? !this.state.isDisabled : this.state.isDisabled;
     }
 
     render() {
@@ -165,7 +174,8 @@ class MasterTopic extends React.Component<IProps, IState> {
                                     alignItems="center"
                                     xs={12}>
                                     <Typography gutterBottom variant="h5" component="div" color="text.secondary">
-                                        Потребно е да се избере ментор, насока и членови на комисија
+                                        Потребно е да се избере студент за кого се однесува магистерската,
+                                        насока и членови на комисија
                                     </Typography>
                                 </Grid>
                                 <Grid
@@ -177,22 +187,73 @@ class MasterTopic extends React.Component<IProps, IState> {
                                     sx={{ marginTop: '30px'}}
                                     xs={6}>
                                     <FormControl sx={{m: 1, width: 200}}>
-                                        <InputLabel id="majorLabel">Насока</InputLabel>
-                                        <Select id="major" labelId="majorLabel" onChange={(value) => {
-                                            this.setMajor(value)
-                                        }} value={this.state.majorId} label="Насока"
-                                                input={<OutlinedInput label="Насока"/>}
-                                                MenuProps={MenuProps}>
-                                            {
-                                                this.state.majors.map((major) => {
-                                                    return (
-                                                        <MenuItem key={major.id} value={major.id}>
-                                                            <ListItemText primary={major.name}/>
-                                                        </MenuItem>
-                                                    )
-                                                })
-                                            }
-                                        </Select>
+                                        <Autocomplete
+                                            disablePortal
+                                            id="major"
+                                            options={this.state.majors}
+                                            getOptionLabel={option => option.name}
+                                            sx={{ width: 250 }}
+                                            renderInput={(params) => <TextField {...params} label="Насока" />}
+                                            onChange={(event, newValue) => {
+                                                console.log(newValue?.id);
+                                                this.setMajor(newValue?.id)
+                                            }}
+                                        />
+                                    {/*    <InputLabel id="majorLabel">Насока</InputLabel>*/}
+                                    {/*    <Select id="major" labelId="majorLabel" onChange={(value) => {*/}
+                                    {/*        this.setMajor(value)*/}
+                                    {/*    }} value={this.state.majorId} label="Насока"*/}
+                                    {/*            input={<OutlinedInput label="Насока"/>}*/}
+                                    {/*            MenuProps={MenuProps}>*/}
+                                    {/*        {*/}
+                                    {/*            this.state.majors.map((major) => {*/}
+                                    {/*                return (*/}
+                                    {/*                    <MenuItem key={major.id} value={major.id}>*/}
+                                    {/*                        <ListItemText primary={major.name}/>*/}
+                                    {/*                    </MenuItem>*/}
+                                    {/*                )*/}
+                                    {/*            })*/}
+                                    {/*        }*/}
+                                    {/*    </Select>*/}
+                                    </FormControl>
+                                </Grid>
+                                <Grid
+                                    item
+                                    container
+                                    direction="row"
+                                    justifyContent="center"
+                                    sx={{ marginTop: '30px'}}
+                                    alignItems="center"
+                                    xs={6}>
+                                    <FormControl sx={{m: 1, width: 200}}>
+                                        <Autocomplete
+                                            disablePortal
+                                            id="student"
+                                            options={this.state.students}
+                                            getOptionLabel={option => option.fullName + ", " + option.index}
+                                            sx={{ width: 250 }}
+                                            renderInput={(params) => <TextField {...params} label="Студент" />}
+                                            onChange={(event, newValue) => {
+                                                console.log(newValue?.id);
+                                                this.setStudent(newValue?.id)
+                                            }}
+                                        />
+                                        {/*<InputLabel id="studentLabel">Студент</InputLabel>*/}
+                                        {/*<Select id="student" labelId="studentLabel" onChange={(value) => {*/}
+                                        {/*    this.setStudent(value)*/}
+                                        {/*}} value={this.state.studentId} label="Студент"*/}
+                                        {/*        input={<OutlinedInput label="Студент"/>}*/}
+                                        {/*        MenuProps={MenuProps}>*/}
+                                        {/*    {*/}
+                                        {/*        this.state.students.map((student) => {*/}
+                                        {/*            return (*/}
+                                        {/*                <MenuItem key={student.id} value={student.id}>*/}
+                                        {/*                    <ListItemText primary={student.fullName + ", " + student.index }/>*/}
+                                        {/*                </MenuItem>*/}
+                                        {/*            )*/}
+                                        {/*        })*/}
+                                        {/*    }*/}
+                                        {/*</Select>*/}
                                     </FormControl>
                                 </Grid>
                                 <Grid
@@ -203,22 +264,34 @@ class MasterTopic extends React.Component<IProps, IState> {
                                     alignItems="center"
                                     xs={6}>
                                     <FormControl sx={{m: 1, width: 200}}>
-                                        <InputLabel id="mentorLabel">Ментор</InputLabel>
-                                        <Select id="mentor" labelId="mentorLabel" onChange={(value) => {
-                                            this.setMentor(value)
-                                        }} value={this.state.mentorId} label="Ментор"
-                                                input={<OutlinedInput label="Ментор"/>}
-                                                MenuProps={MenuProps}>
-                                            {
-                                                this.state.professors.map((prof) => {
-                                                    return (
-                                                        <MenuItem key={prof.id} value={prof.id}>
-                                                            <ListItemText primary={prof.fullName}/>
-                                                        </MenuItem>
-                                                    )
-                                                })
-                                            }
-                                        </Select>
+                                        <Autocomplete
+                                            disablePortal
+                                            id="firstCommittee"
+                                            options={this.state.professors}
+                                            getOptionLabel={option => option.fullName}
+                                            sx={{ width: 250 }}
+                                            renderInput={(params) => <TextField {...params} label="Комисија 1" />}
+                                            onChange={(event, newValue) => {
+                                                console.log(newValue?.id);
+                                                this.setCommitteeFirst(newValue?.id)
+                                            }}
+                                        />
+                                        {/*<InputLabel id="committee1Label">Комисија 1</InputLabel>*/}
+                                        {/*<Select id="committee1" labelId="committeeLabel" onChange={(value) => {*/}
+                                        {/*    this.setCommitteeFirst(value)*/}
+                                        {/*}} value={this.state.firstCommittee} label="Комисија 1"*/}
+                                        {/*        input={<OutlinedInput label="Комисија 1"/>}*/}
+                                        {/*        MenuProps={MenuProps}>*/}
+                                        {/*    {*/}
+                                        {/*        this.state.professors.map((prof) => {*/}
+                                        {/*            return (*/}
+                                        {/*                <MenuItem key={prof.id} value={prof.id}>*/}
+                                        {/*                    <ListItemText primary={prof.fullName}/>*/}
+                                        {/*                </MenuItem>*/}
+                                        {/*            )*/}
+                                        {/*        })*/}
+                                        {/*    }*/}
+                                        {/*</Select>*/}
                                     </FormControl>
                                 </Grid>
                                 <Grid
@@ -229,48 +302,34 @@ class MasterTopic extends React.Component<IProps, IState> {
                                     alignItems="center"
                                     xs={6}>
                                     <FormControl sx={{m: 1, width: 200}}>
-                                        <InputLabel id="committee1Label">Комисија 1</InputLabel>
-                                        <Select id="committee1" labelId="committeeLabel" onChange={(value) => {
-                                            this.setCommitteeFirst(value)
-                                        }} value={this.state.firstCommittee} label="Комисија 1"
-                                                input={<OutlinedInput label="Комисија 1"/>}
-                                                MenuProps={MenuProps}>
-                                            {
-                                                this.state.professors.map((prof) => {
-                                                    return (
-                                                        <MenuItem key={prof.id} value={prof.id}>
-                                                            <ListItemText primary={prof.fullName}/>
-                                                        </MenuItem>
-                                                    )
-                                                })
-                                            }
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid
-                                    item
-                                    container
-                                    direction="row"
-                                    justifyContent="center"
-                                    alignItems="center"
-                                    xs={6}>
-                                    <FormControl sx={{m: 1, width: 200}}>
-                                        <InputLabel id="committee2Label">Комисија 2</InputLabel>
-                                        <Select id="committee2" labelId="committee2Label" onChange={(value) => {
-                                            this.setCommitteeSecond(value)
-                                        }} value={this.state.secondCommittee} label="Комисија 2"
-                                                input={<OutlinedInput label="Комисија 2"/>}
-                                                MenuProps={MenuProps}>
-                                            {
-                                                this.state.professors.map((prof) => {
-                                                    return (
-                                                        <MenuItem key={prof.id} value={prof.id}>
-                                                            <ListItemText primary={prof.fullName}/>
-                                                        </MenuItem>
-                                                    )
-                                                })
-                                            }
-                                        </Select>
+                                        <Autocomplete
+                                            disablePortal
+                                            id="secondCommittee"
+                                            options={this.state.professors}
+                                            getOptionLabel={option => option.fullName}
+                                            sx={{ width: 250 }}
+                                            renderInput={(params) => <TextField {...params} label="Комисија 2" />}
+                                            onChange={(event, newValue) => {
+                                                console.log(newValue?.id);
+                                                this.setCommitteeSecond(newValue?.id)
+                                            }}
+                                        />
+                                        {/*<InputLabel id="committee2Label">Комисија 2</InputLabel>*/}
+                                        {/*<Select id="committee2" labelId="committee2Label" onChange={(value) => {*/}
+                                        {/*    this.setCommitteeSecond(value)*/}
+                                        {/*}} value={this.state.secondCommittee} label="Комисија 2"*/}
+                                        {/*        input={<OutlinedInput label="Комисија 2"/>}*/}
+                                        {/*        MenuProps={MenuProps}>*/}
+                                        {/*    {*/}
+                                        {/*        this.state.professors.map((prof) => {*/}
+                                        {/*            return (*/}
+                                        {/*                <MenuItem key={prof.id} value={prof.id}>*/}
+                                        {/*                    <ListItemText primary={prof.fullName}/>*/}
+                                        {/*                </MenuItem>*/}
+                                        {/*            )*/}
+                                        {/*        })*/}
+                                        {/*    }*/}
+                                        {/*</Select>*/}
                                     </FormControl>
                                 </Grid>
                             </Grid>

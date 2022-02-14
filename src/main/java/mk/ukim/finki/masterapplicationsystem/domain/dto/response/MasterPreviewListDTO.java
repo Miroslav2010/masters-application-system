@@ -9,11 +9,9 @@ import java.util.List;
 @Data
 @Getter
 @AllArgsConstructor
-public class CurrentStepDTO {
+public class MasterPreviewListDTO {
 
-    private String processState;
+    private List<MasterPreviewDTO> masterPreviews;
 
-    private List<String> assignedPersons;
-
-    private String assignedRole;
+    private Long mastersNumber;
 }

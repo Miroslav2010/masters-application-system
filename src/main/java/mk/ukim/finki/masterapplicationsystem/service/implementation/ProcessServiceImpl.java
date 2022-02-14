@@ -2,13 +2,18 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Process;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
+import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewView;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.repository.ProcessRepository;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +36,11 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
+    public Page<MasterPreviewView> findAllView(String personId, String filter, Pageable pageable) {
+        return processRepository.findAllMastersFromProcess(personId, "%" + filter + "%", pageable);
+    }
+
+    @Override
     public Process findProcessById(String id) {
         return processRepository.findById(id).orElseThrow(() -> new RuntimeException("Process with id " + id + " was not found"));
     }
@@ -44,6 +54,11 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public Process getProcessByMasterId(String id) {
         return processRepository.findByMasterId(id).orElseThrow(() -> new RuntimeException("Master with id " + id + " was not found"));
+    }
+
+    @Override
+    public List<Process> findAllThatAreInStates(List<ProcessState> processStates) {
+        return processRepository.findAllByProcessStateIn(processStates);
     }
 
     @Override

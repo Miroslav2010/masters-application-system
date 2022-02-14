@@ -10,6 +10,7 @@ import mk.ukim.finki.masterapplicationsystem.service.StepService;
 import mk.ukim.finki.masterapplicationsystem.service.StepValidationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -189,11 +190,13 @@ public class StepServiceImpl implements StepService {
                 .orElseThrow(() -> new RuntimeException("There is not a attachment step with name " + name + " for process with id " + processId));
     }
 
-    private Document saveDocument(String personId, ProcessState processState, MultipartFile file) {
+    private Document saveDocument(String processId, ProcessState processState, MultipartFile file) {
         try {
-            if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState))
-                return documentService.saveDraft(personId, file);
-            return documentService.saveRepost(personId, file);
+            Master master = processService.getProcessMaster(processId);
+            if (EnumSet.of(STUDENT_DRAFT, STUDENT_CHANGES_DRAFT).contains(processState)){
+                return documentService.saveDraft(master.getStudent().getId(), file);
+            }
+            return documentService.saveRepost(master.getStudent().getId(), file);
         }
         catch (Exception e) {
             throw new RuntimeException("Save draft failed - log: " + e.getMessage());
@@ -235,9 +238,9 @@ public class StepServiceImpl implements StepService {
     }
 
     @Override
-    public Attachment editAttachment(String processId, ProcessState processState, String personId, String attachmentStepName, MultipartFile file) throws IOException {
+    public Attachment editAttachment(String processId, ProcessState processState, String attachmentStepName, MultipartFile file) {
         Attachment attachment = getAttachmentFromProcess(processId, attachmentStepName);
-        Document document = saveDocument(personId, processState, file);
+        Document document = saveDocument(processId, processState, file);
         attachment.setDocument(document);
         logger.info("Edited attachment for process: {} with name", processId);
         attachment = stepRepository.save(attachment);

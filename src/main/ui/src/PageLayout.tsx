@@ -5,6 +5,8 @@ import logo from './images/logo.png';
 import {createStyles, makeStyles} from "@mui/styles";
 import Authentication from "./components/auth/Authentication";
 import {useNavigate} from "react-router-dom";
+import masterService from "./service/masterService";
+import personService from "./service/personService";
 
 const useStyles = makeStyles(() =>
     createStyles({
@@ -24,6 +26,10 @@ const useStyles = makeStyles(() =>
 export const PageLayout: FC = ({children}) => {
     const classes = useStyles();
     const navigate = useNavigate();
+
+    // const isLoggedIn = () => {
+    //     return personService.getLoggedInUser();
+    // }
 
     return (
         <React.Fragment>

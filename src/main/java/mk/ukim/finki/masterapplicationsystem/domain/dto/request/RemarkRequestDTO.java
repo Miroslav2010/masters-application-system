@@ -6,5 +6,6 @@ import lombok.Getter;
 @Data
 @Getter
 public class RemarkRequestDTO {
+    String remarkId;
     String remark;
 }

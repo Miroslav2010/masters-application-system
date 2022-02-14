@@ -9,6 +9,7 @@ import RemarkService from "../../service/remarkService";
 import {RemarkDTO} from "../../domain/remarkResponse";
 import {StepValidationDto} from "../../domain/StepValidationDto";
 import {CurrentStepDto} from "../../domain/CurrentStepDto";
+import {PersonDto} from "../../domain/PersonDto";
 
 interface Props {
     params: string;
@@ -21,6 +22,7 @@ interface State {
     // currentStep: StepPreviewDto | undefined;
     stepHistory: StepHistoryDto | undefined;
     student: StudentDto | undefined,
+    mentor: PersonDto | undefined,
     remarks: RemarkDTO[],
     validations: StepValidationDto[],
     currentStep: CurrentStepDto | undefined,
@@ -40,6 +42,7 @@ class MasterDetailsWrap extends React.Component<Props, State> {
             stepHistory: undefined,
             // currentStep: undefined,
             student: undefined,
+            mentor: undefined,
             currentStep: undefined,
             remarks: [],
             validations: [],
@@ -70,11 +73,12 @@ class MasterDetailsWrap extends React.Component<Props, State> {
                     loadingRemarks: false
                 })
             });
-        masterService.getStudent(this.state.processId)
-            .then(student => {
-                console.log(student);
+        masterService.getStudentAndMentor(this.state.processId)
+            .then(studentMentor => {
+                console.log(studentMentor);
                 this.setState({
-                    student: student
+                    student: studentMentor.student,
+                    mentor: studentMentor.mentor
                 })
             });
         masterService.getCurrentStepInfo(this.state.processId)
@@ -92,7 +96,7 @@ class MasterDetailsWrap extends React.Component<Props, State> {
                 <MasterDetails processId={this.state.processId} steps={this.state.steps} getHistoryStep={this.getHistoryStep}
                                historyStep={this.state.stepHistory} student={this.state.student} remarks={this.state.remarks}
                                validations={this.state.validations} processState={this.state.processState} newData={this.stillLoading()}
-                               currentStep={this.state.currentStep}/>
+                               currentStep={this.state.currentStep} mentor={this.state.mentor}/>
             </div>
         )
     }

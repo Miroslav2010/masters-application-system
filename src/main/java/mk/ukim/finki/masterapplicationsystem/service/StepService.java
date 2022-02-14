@@ -51,7 +51,7 @@ public interface StepService {
 
     Attachment initializeAttachment(String processId);
 
-    Attachment editAttachment(String processId, ProcessState processState, String personId, String attachmentStepName, MultipartFile file) throws IOException;
+    Attachment editAttachment(String processId, ProcessState processState, String attachmentStepName, MultipartFile file);
 
     Step setClosedDateTime(String stepId, OffsetDateTime closedDateTime);
 

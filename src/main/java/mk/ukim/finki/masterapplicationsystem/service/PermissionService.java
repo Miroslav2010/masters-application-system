@@ -12,7 +12,7 @@ public interface PermissionService {
 
     void canPersonTakeAction(String processId, String personId, String permissionType);
 
-    void canPersonCreateMaster(String personId);
+    void canPersonCreateMaster(String mentorId, String studentId);
 
     void canPersonViewMasterDetails(String processId, String personId);
 

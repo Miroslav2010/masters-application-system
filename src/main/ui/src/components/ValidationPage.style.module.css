@@ -25,6 +25,10 @@
     margin-right: 15px;
 }
 
+.wordBreakFileName {
+    word-break: break-word;
+}
+
 .alignItemsCenter {
     align-items: center;
 }

@@ -39,6 +39,11 @@ public class StepValidationServiceImpl implements StepValidationService {
     }
 
     @Override
+    public ValidationStatus findValidationStatusByStepIdAndPersonId(String stepId, String personId) {
+        return findByStepIdAndPersonId(stepId, personId).getValidationStatus();
+    }
+
+    @Override
     public List<StepValidation> findAllByValidationId(String validationId) {
         return stepValidationRepository.findAllByValidationId(validationId);
     }
@@ -54,7 +59,7 @@ public class StepValidationServiceImpl implements StepValidationService {
     public StepValidation changeStepValidationStatus(Step validationStep, Person person, ValidationStatus validationStatus) {
         List<Role> roles = person.getRoles();
         StepValidation stepValidation;
-        if(roles.contains(STUDENT_SERVICE) || roles.contains(SECRETARY) || roles.contains(NNK))
+        if(roles.contains(STUDENT_SERVICE) || roles.contains(SECRETARY) || roles.contains(NNK) || roles.contains(SYSTEM_USER))
             stepValidation = createStepValidation((Validation) validationStep, person);
         else
             stepValidation = findByStepIdAndPersonId(validationStep.getId(), person.getId());

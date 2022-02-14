@@ -5,6 +5,7 @@ import styles from "../ValidationPage.style.module.css";
 import {styled} from "@mui/styles";
 import Divider from "@mui/material/Divider";
 import masterService from "../../service/masterService";
+import {useState} from "react";
 
 
 interface Props {
@@ -24,6 +25,7 @@ export default function DocumentUpload(props: Props) {
     const Input = styled('input')({
         display: 'none',
     });
+    const [isDisabled, setIsDisabled] = useState(false);
     const [formData, updateFormData] = React.useState<IUseState>({
         topic: "",
         description: "",
@@ -53,8 +55,9 @@ export default function DocumentUpload(props: Props) {
     }
 
     const updateIsDisabled = () => {
-        return formData.topic == "" || formData.description == "" || formData.application == null ||
-            formData.mentorApproval == null || formData.biography == null || formData.supplement == null;
+        return (formData.topic == "" || formData.description == "" || formData.application == null ||
+            formData.mentorApproval == null || formData.biography == null || formData.supplement == null)
+            ? !isDisabled : isDisabled
     }
 
     const onSubmit = () => {
@@ -65,6 +68,7 @@ export default function DocumentUpload(props: Props) {
         console.log(formData.biography)
         console.log(formData.supplement)
 
+        setIsDisabled(true);
         masterService.createMasterTopic(
             props.processId,
             formData.topic,

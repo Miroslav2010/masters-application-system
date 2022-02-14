@@ -9,7 +9,8 @@ public enum Role implements GrantedAuthority {
     STUDENT_SERVICE,
     SECRETARY,
     NNK,
-    HEAD_OF_NNK;
+    HEAD_OF_NNK,
+    SYSTEM_USER;
 
     @Override
     public String getAuthority() {

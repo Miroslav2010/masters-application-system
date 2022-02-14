@@ -40,8 +40,14 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public List<Person> getProfessors() {
-        return personRepository.findAllByRolesContaining(Role.PROFESSOR);
+    public List<Person> getAllPersonsFromRole(Role role) {
+        return personRepository.findAllByRolesContaining(role);
+    }
+
+    @Override
+    public Person getSystemUser() {
+        return personRepository.findAllByRolesContaining(Role.SYSTEM_USER).stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("System user not found"));
     }
 
     @Override

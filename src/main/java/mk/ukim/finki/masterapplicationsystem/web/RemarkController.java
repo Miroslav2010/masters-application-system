@@ -41,7 +41,7 @@ public class RemarkController {
         //TODO: get current person
         //TODO: Rollback
 //        RemarkDto remarkDto = new RemarkDto(remark, person);
-        remarkService.saveRemark(processId, remark.getRemark());
+        remarkService.editRemark(processId, remark.getRemarkId(), remark.getRemark());
         return ResponseEntity.ok().build();
     }
 

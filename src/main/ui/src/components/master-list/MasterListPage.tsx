@@ -14,8 +14,12 @@ import Paper from '@mui/material/Paper';
 import {visuallyHidden} from '@mui/utils';
 import {MasterPreviewDto} from "../../domain/masterPreviewDto";
 
+import useDebounce from '../../hooks/usehooks-ts'
 import { useNavigate } from 'react-router-dom';
-import {Button} from "@mui/material";
+import {Button, TextField} from "@mui/material";
+import personService from "../../service/personService";
+import CircularProgress from "@mui/material/CircularProgress";
+import {ChangeEvent, useEffect} from "react";
 
 interface Data {
     student: string;
@@ -143,14 +147,32 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface Prop {
     masters: MasterPreviewDto[];
+    mastersNumber: number;
+    loading: boolean;
+    getMasters: Function,
+    search: string,
 }
 
 export default function EnhancedTable(props: Prop) {
-    const [order, setOrder] = React.useState<Order>('asc');
-    const [orderBy, setOrderBy] = React.useState<keyof Data>('student');
+    const [order, setOrder] = React.useState<Order>('desc');
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('lastModified');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const navigate = useNavigate();
+    const [searchValue, setSearchValue] = React.useState<string>(props.search)
+    const debouncedValue = useDebounce<string>(searchValue, 500)
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(event.target.value)
+    }
+
+    // Fetch API (optional)
+    useEffect(() => {
+        console.log(searchValue);
+        // Do fetch here...
+        // Triggers when "debouncedValue" changes
+        props.getMasters(page, rowsPerPage, searchValue);
+    }, [debouncedValue])
 
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
@@ -168,21 +190,37 @@ export default function EnhancedTable(props: Prop) {
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
+        console.log("change page :" + newPage + ", size " + rowsPerPage);
+        props.getMasters(newPage, rowsPerPage, searchValue);
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
+        console.log("change page :" + page + ", size " + parseInt(event.target.value, 10));
+        props.getMasters(page, parseInt(event.target.value, 10), searchValue);
     };
+
+    const canCreateMaster = () => {
+        let user = personService.getLoggedInUser();
+        if (user == "")
+            return false;
+        return user["roles"][0] == "PROFESSOR";
+    }
 
     // const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.masters.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - props.mastersNumber) : 0;
 
     return (
         <Box sx={{width: '100%'}}>
+            {props.loading ?
+                <div style={{minHeight: '85vh', minWidth: '50vw', marginTop: '200px', textAlign: 'center'}}>
+                    <CircularProgress disableShrink size={70} />
+                </div>
+                :
             <Paper sx={{width: '100%', mb: 2}}>
                 <Toolbar
                     sx={{
@@ -192,15 +230,18 @@ export default function EnhancedTable(props: Prop) {
                     }}
                 >
                     <Typography
-                        sx={{flex: '1 1 100%'}}
+                        sx={{flex: '1'}}
                         variant="h6"
                         id="tableTitle"
                         component="div"
                     >
                         Магистерски трудови
                     </Typography>
+                    <TextField id="searchMasters" fullWidth defaultValue={props.search == "" ? "" : props.search}  label="Пребарај" variant="standard" sx={{ width: '50%', marginRight: '150px' }}
+                               onChange={handleChange} />
+                    {canCreateMaster() &&
                     <Button variant="contained" color={'primary'} onClick={(event) =>
-                        handleClick(event, `/masterTopic`)}>Додади</Button>
+                        handleClick(event, `/masterTopic`)}>Додади</Button>}
                 </Toolbar>
                 <TableContainer>
                     <Table
@@ -217,9 +258,9 @@ export default function EnhancedTable(props: Prop) {
                         <TableBody>
                             {/* if you don't need to support IE11, you can replace the `stableSort` call with:
               rows.slice().sort(getComparator(order, orderBy)) */}
-                            {stableSort<MasterPreviewDto>(props.masters, getComparator(order, orderBy))
-                                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                .map((row, index) => {
+                            {/*{stableSort<MasterPreviewDto>(props.masters, getComparator(order, orderBy))*/}
+                            {/*    // .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)*/}
+                            {props.masters.map((row, index) => {
                                     const labelId = `enhanced-table-checkbox-${index}`;
 
                                     return (
@@ -262,13 +303,14 @@ export default function EnhancedTable(props: Prop) {
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={props.masters.length}
+                    count={props.mastersNumber}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
             </Paper>
+            }
         </Box>
     );
 }

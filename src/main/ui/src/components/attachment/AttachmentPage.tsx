@@ -5,6 +5,7 @@ import styles from "../ValidationPage.style.module.css";
 import {styled} from "@mui/styles";
 import Divider from "@mui/material/Divider";
 import masterService from "../../service/masterService";
+import {useState} from "react";
 
 
 interface Props {
@@ -17,6 +18,7 @@ interface IUseState {
 }
 
 export default function AttachmentPage(props: Props) {
+    const [isDisabled, setIsDisabled] = useState(false);
     const Input = styled('input')({
         display: 'none',
     });
@@ -32,12 +34,13 @@ export default function AttachmentPage(props: Props) {
     }
 
     const updateIsDisabled = () => {
-        return formData.draft == null;
+        return formData.draft == null ? !isDisabled : isDisabled;
     }
 
     const onSubmit = () => {
         console.log(formData.draft)
 
+        setIsDisabled(true);
         masterService.uploadDraft(
             props.processId,
             formData.draft

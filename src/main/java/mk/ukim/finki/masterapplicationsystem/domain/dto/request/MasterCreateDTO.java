@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MasterCreateDTO {
 
     private String majorId;
-    private String mentorId;
+    private String studentId;
     private String firstCommitteeId;
     private String secondCommitteeId;
 
