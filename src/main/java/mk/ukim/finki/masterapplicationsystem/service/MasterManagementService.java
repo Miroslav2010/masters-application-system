@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface MasterManagementService {
 
@@ -36,7 +35,7 @@ public interface MasterManagementService {
 
     StepPreviewDTO getAllFinishedSteps(String processId);
 
-    StudentMentorDTO getStudentAndMentor(String processId);
+    MasterBasicInfoDTO getMasterBasicInfo(String processId);
 
     CurrentStepDTO getCurrentStepInfo(String processId);
 

@@ -23,6 +23,7 @@ interface State {
     stepHistory: StepHistoryDto | undefined;
     student: StudentDto | undefined,
     mentor: PersonDto | undefined,
+    archiveNumber: string | null,
     remarks: RemarkDTO[],
     validations: StepValidationDto[],
     currentStep: CurrentStepDto | undefined,
@@ -43,6 +44,7 @@ class MasterDetailsWrap extends React.Component<Props, State> {
             // currentStep: undefined,
             student: undefined,
             mentor: undefined,
+            archiveNumber: null,
             currentStep: undefined,
             remarks: [],
             validations: [],
@@ -73,12 +75,13 @@ class MasterDetailsWrap extends React.Component<Props, State> {
                     loadingRemarks: false
                 })
             });
-        masterService.getStudentAndMentor(this.state.processId)
-            .then(studentMentor => {
-                console.log(studentMentor);
+        masterService.getMasterBasicInfo(this.state.processId)
+            .then(masterInfo => {
+                console.log(masterInfo);
                 this.setState({
-                    student: studentMentor.student,
-                    mentor: studentMentor.mentor
+                    student: masterInfo.student,
+                    mentor: masterInfo.mentor,
+                    archiveNumber: masterInfo.archiveNumber
                 })
             });
         masterService.getCurrentStepInfo(this.state.processId)
@@ -96,7 +99,7 @@ class MasterDetailsWrap extends React.Component<Props, State> {
                 <MasterDetails processId={this.state.processId} steps={this.state.steps} getHistoryStep={this.getHistoryStep}
                                historyStep={this.state.stepHistory} student={this.state.student} remarks={this.state.remarks}
                                validations={this.state.validations} processState={this.state.processState} newData={this.stillLoading()}
-                               currentStep={this.state.currentStep} mentor={this.state.mentor}/>
+                               currentStep={this.state.currentStep} mentor={this.state.mentor} archiveNumber={this.state.archiveNumber}/>
             </div>
         )
     }

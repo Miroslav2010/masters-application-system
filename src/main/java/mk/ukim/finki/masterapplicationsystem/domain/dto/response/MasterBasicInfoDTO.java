@@ -9,10 +9,12 @@ import mk.ukim.finki.masterapplicationsystem.domain.Student;
 @Data
 @Getter
 @AllArgsConstructor
-public class StudentMentorDTO {
+public class MasterBasicInfoDTO {
 
     Student student;
 
     Professor mentor;
+
+    String archiveNumber;
 
 }

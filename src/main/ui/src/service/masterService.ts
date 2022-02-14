@@ -46,8 +46,8 @@ const masterService = {
             .then(result => result.data);
     },
 
-    getStudentAndMentor: (processId: string) => {
-        return instance.get(`/api/master/${processId}/studentMentor`)
+    getMasterBasicInfo: (processId: string) => {
+        return instance.get(`/api/master/${processId}/masterInfo`)
             .then(result => result.data);
     },
 
@@ -69,6 +69,13 @@ const masterService = {
     cancelChangeLoop: (processId: string) => {
         return instance.post(`/api/master/${processId}/cancel-revision`)
             .then(result => result.data);
+    },
+
+    setArchiveNumber: (processId: string, archiveNumber: string) => {
+        return instance.post(`/api/master/archive-number`, {
+            processId: processId,
+            archiveNumber: archiveNumber
+        }).then(result => result.data);
     },
 
     translate: (name: string) => {

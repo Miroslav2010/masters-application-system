@@ -16,7 +16,6 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -224,6 +223,8 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     @Transactional
     @Override
     public Master setArchiveNumber(String processId, String archiveNumber) {
+        Person loggedInUser = personService.getLoggedInUser();
+        permissionService.canPersonSetArchiveNumber(processId, loggedInUser.getId());
         Master master = processService.getProcessMaster(processId);
         return masterService.setArchiveNumber(master.getId(), archiveNumber);
     }
@@ -316,11 +317,11 @@ public class MasterManagementServiceImpl implements MasterManagementService {
     }
 
     @Override
-    public StudentMentorDTO getStudentAndMentor(String processId) {
+    public MasterBasicInfoDTO getMasterBasicInfo(String processId) {
         Person loggedInUser = personService.getLoggedInUser();
         permissionService.canPersonViewMasterDetails(processId, loggedInUser.getId());
         Master master = processService.getProcessMaster(processId);
-        return new StudentMentorDTO(master.getStudent(), master.getMentor());
+        return new MasterBasicInfoDTO(master.getStudent(), master.getMentor(), master.getArchiveNumber());
     }
 
     @Override

@@ -22,6 +22,8 @@ public interface PermissionService {
 
     void canPersonCancelRevisionLoop(String processId, String personId);
 
+    void canPersonSetArchiveNumber(String processId, String personId);
+
     void canPersonUploadAttachment(String processId, String personId);
 
     void canPersonWriteRemark(String processId, String personId);
