@@ -150,7 +150,7 @@ interface Prop {
     mastersNumber: number;
     loading: boolean;
     getMasters: Function,
-    search: string,
+    search: string
 }
 
 export default function EnhancedTable(props: Prop) {
@@ -171,7 +171,8 @@ export default function EnhancedTable(props: Prop) {
         console.log(searchValue);
         // Do fetch here...
         // Triggers when "debouncedValue" changes
-        props.getMasters(page, rowsPerPage, searchValue);
+        setPage(0);
+        props.getMasters(0, rowsPerPage, searchValue, orderBy, order);
     }, [debouncedValue])
 
     const handleRequestSort = (
@@ -181,6 +182,8 @@ export default function EnhancedTable(props: Prop) {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
+        console.log(property, isAsc ? 'desc' : 'asc');
+        props.getMasters(page, rowsPerPage, searchValue, property, isAsc ? 'desc' : 'asc');
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, path: string) => {
@@ -191,14 +194,14 @@ export default function EnhancedTable(props: Prop) {
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
         console.log("change page :" + newPage + ", size " + rowsPerPage);
-        props.getMasters(newPage, rowsPerPage, searchValue);
+        props.getMasters(newPage, rowsPerPage, searchValue, orderBy, order);
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
         console.log("change page :" + page + ", size " + parseInt(event.target.value, 10));
-        props.getMasters(page, parseInt(event.target.value, 10), searchValue);
+        props.getMasters(0, parseInt(event.target.value, 10), searchValue, orderBy, order);
     };
 
     const canCreateMaster = () => {

@@ -34,7 +34,7 @@ public class ValidationScheduler {
     }
 
     private boolean checkIfStepIsNotValidatedForThreeDays(Step step) {
-        return step.getCreated().plusDays(2).isBefore(OffsetDateTime.now());
+        return step.getCreated().plusDays(3).isBefore(OffsetDateTime.now());
     }
 
     private void validateStep(Step step) {

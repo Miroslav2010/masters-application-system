@@ -3,9 +3,9 @@ package mk.ukim.finki.masterapplicationsystem.service.implementation;
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Person;
 import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewDTO;
-import mk.ukim.finki.masterapplicationsystem.domain.dto.response.MasterPreviewView;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.ProcessState;
 import mk.ukim.finki.masterapplicationsystem.domain.enumeration.Role;
+import mk.ukim.finki.masterapplicationsystem.domain.view.MasterView;
 import mk.ukim.finki.masterapplicationsystem.service.PersonService;
 import mk.ukim.finki.masterapplicationsystem.service.ProcessService;
 import org.springframework.stereotype.Service;
@@ -98,10 +98,10 @@ public class ProcessStateHelperService {
         return new SimpleDateFormat("dd-MM-yyyy HH:mm").format(dateTime);
     }
 
-    public MasterPreviewDTO convertToMasterPreview(MasterPreviewView masterView) {
-        String label = valueOf(masterView.getSTEP()).label;
-        String lastModifiedDateTime = formatDateTime(masterView.getLASTMODIFIED());
+    public MasterPreviewDTO convertToMasterPreview(MasterView masterView) {
+        String label = valueOf(masterView.getStep()).label;
+        String lastModifiedDateTime = formatDateTime(masterView.getLastModified());
 
-        return new MasterPreviewDTO(masterView.getID(), masterView.getSTUDENT(), masterView.getMENTOR(), label, lastModifiedDateTime);
+        return new MasterPreviewDTO(masterView.getId(), masterView.getStudent(), masterView.getMentor(), label, lastModifiedDateTime);
     }
 }

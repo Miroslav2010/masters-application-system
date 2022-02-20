@@ -4,10 +4,14 @@ import mk.ukim.finki.masterapplicationsystem.domain.Major;
 import mk.ukim.finki.masterapplicationsystem.domain.Master;
 import mk.ukim.finki.masterapplicationsystem.domain.Professor;
 import mk.ukim.finki.masterapplicationsystem.domain.Student;
+import mk.ukim.finki.masterapplicationsystem.domain.view.MasterView;
 import mk.ukim.finki.masterapplicationsystem.repository.MasterRepository;
+import mk.ukim.finki.masterapplicationsystem.repository.MasterViewRepository;
 import mk.ukim.finki.masterapplicationsystem.service.MasterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -17,9 +21,11 @@ import java.util.List;
 public class MasterServiceImpl implements MasterService {
     private final Logger logger = LoggerFactory.getLogger(MasterServiceImpl.class);
     private final MasterRepository masterRepository;
+    private final MasterViewRepository masterViewRepository;
 
-    public MasterServiceImpl(MasterRepository masterRepository) {
+    public MasterServiceImpl(MasterRepository masterRepository, MasterViewRepository masterViewRepository) {
         this.masterRepository = masterRepository;
+        this.masterViewRepository = masterViewRepository;
     }
 
     @Override
@@ -109,6 +115,11 @@ public class MasterServiceImpl implements MasterService {
         master = masterRepository.save(master);
         logger.debug(String.format("Master with id: %s has archive number %s", id, archiveNumber));
         return master;
+    }
+
+    @Override
+    public Page<MasterView> findAllMastersPageable(String personId, String filter, Pageable pageable) {
+        return masterViewRepository.findAllPageable(personId, "%" + filter.toLowerCase() + "%", pageable);
     }
 
     @Override

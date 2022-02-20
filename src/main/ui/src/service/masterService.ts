@@ -36,8 +36,8 @@ const masterService = {
         }).then(result => result.data);
     },
 
-    getAllMasters: (page: number, size: number, filter: string) => {
-        return instance.get(`/api/master/all?page=${page}&size=${size}&filter=${filter}`)
+    getAllMasters: (page: number, size: number, filter: string, orderBy: string, order: string) => {
+        return instance.get(`/api/master/all?page=${page}&size=${size}&sort=${orderBy},${order}&filter=${filter}`)
             .then(result => result.data);
     },
 

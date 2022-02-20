@@ -3,7 +3,6 @@ import {PageLayout} from "../../PageLayout";
 import {MasterPreviewDto} from "../../domain/masterPreviewDto";
 import masterService from "../../service/masterService";
 import EnhancedTable from "./MasterListPage";
-import {MasterPreviewListDto} from "../../domain/MasterPreviewListDto";
 
 interface Props {
     // params: string;
@@ -32,14 +31,14 @@ class MasterWrap extends React.Component<Props, State> {
 
     componentDidMount() {
         console.log("did mount");
-        this.getMasters(0, 5, "");
+        this.getMasters(0, 5, "", "lastModified", "desc");
     }
 
-    getMasters = (page: number, size: number, filter: string) => {
+    getMasters = (page: number, size: number, filter: string, orderBy: string, order: string) => {
         this.setState({
         loading: true
         });
-        masterService.getAllMasters(page, size, filter)
+        masterService.getAllMasters(page, size, filter, orderBy, order)
             .then(masters => {
                 console.log(masters);
                 this.setState({
