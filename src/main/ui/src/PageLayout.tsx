@@ -33,41 +33,43 @@ export const PageLayout: FC = ({children}) => {
 
     return (
         <React.Fragment>
-            <AppBar position="static">
-                <Container>
-                    <Toolbar>
-                        <Button color="inherit" sx={{marginRight: '30px'}}>
-                            <img src={logo} alt="Kitty Katty!" className={classes.logo} onClick={() => navigate("/")}/>
-                        </Button>
+            <div style={{display: 'flex', minHeight: '100vh', flexDirection: 'column'}}>
+                <AppBar position="static">
+                    <Container>
+                        <Toolbar>
+                            <Button color="inherit" sx={{marginRight: '30px'}}>
+                                <img src={logo} alt="Kitty Katty!" className={classes.logo} onClick={() => navigate("/")}/>
+                            </Button>
 
-                        <Typography variant="h6" className={classes.title}>
-                            <Button color="inherit" onClick={() => navigate("/masters")}>Магистерски трудови</Button>
-                        </Typography>
+                            <Typography variant="h6" className={classes.title}>
+                                <Button color="inherit" onClick={() => navigate("/masters")}>Магистерски трудови</Button>
+                            </Typography>
 
-                        <Authentication/>
-                    </Toolbar>
-                </Container>
-            </AppBar>
-            <Container>
-                {children}
-            </Container>
-            <footer style={{position: 'absolute',
-                bottom: '0',
-                width: '99.3%',
-                height: '2rem'}}>
-                <Box
-                    px={{ xs: 3, sm: 10 }}
-                    py={{ xs: 3, sm: 5 }}
-                    bgcolor="text.secondary"
-                    color="white"
-                >
-                    <Container maxWidth="lg">
-                        <Box textAlign="center">
-                            Finki UKIM MK &reg; {new Date().getFullYear()}
-                        </Box>
+                            <Authentication/>
+                        </Toolbar>
                     </Container>
-                </Box>
-            </footer>
+                </AppBar>
+                <Container sx={{flex: '1'}}>
+                    {children}
+                </Container>
+                <footer style={{
+                    bottom: '0',
+                    width: '100%',
+                    height: '2rem'}}>
+                    <Box
+                        px={{ xs: 3, sm: 10 }}
+                        py={{ xs: 3, sm: 5 }}
+                        bgcolor="text.secondary"
+                        color="white"
+                    >
+                        <Container maxWidth="lg">
+                            <Box textAlign="center">
+                                Finki UKIM MK &reg; {new Date().getFullYear()}
+                            </Box>
+                        </Container>
+                    </Box>
+                </footer>
+            </div>
         </React.Fragment>
     );
 }

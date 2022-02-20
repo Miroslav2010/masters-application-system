@@ -150,16 +150,12 @@ interface Prop {
     mastersNumber: number;
     loading: boolean;
     getMasters: Function,
-    search: string,
-    orderBy: string,
-    order: string
+    search: string
 }
 
 export default function EnhancedTable(props: Prop) {
-    const [order, setOrder] = React.useState<Order>((props.order === 'asc' || props.order === 'desc') ? props.order : 'desc' );
-    console.log(props.order, props.orderBy)
-    const [orderBy, setOrderBy] =
-            React.useState<keyof Data>((props.orderBy == 'student' || props.orderBy == 'mentor' || props.orderBy == 'step' || props.orderBy == 'lastModified') ? props.orderBy : 'lastModified');
+    const [order, setOrder] = React.useState<Order>('desc');
+    const [orderBy, setOrderBy] = React.useState<keyof Data>('lastModified');
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
     const navigate = useNavigate();
@@ -175,7 +171,8 @@ export default function EnhancedTable(props: Prop) {
         console.log(searchValue);
         // Do fetch here...
         // Triggers when "debouncedValue" changes
-        props.getMasters(page, rowsPerPage, searchValue, orderBy, order);
+        setPage(0);
+        props.getMasters(0, rowsPerPage, searchValue, orderBy, order);
     }, [debouncedValue])
 
     const handleRequestSort = (
@@ -185,7 +182,8 @@ export default function EnhancedTable(props: Prop) {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
-        props.getMasters(page, rowsPerPage, searchValue, orderBy, order);
+        console.log(property, isAsc ? 'desc' : 'asc');
+        props.getMasters(page, rowsPerPage, searchValue, property, isAsc ? 'desc' : 'asc');
     };
 
     const handleClick = (event: React.MouseEvent<unknown>, path: string) => {
@@ -203,7 +201,7 @@ export default function EnhancedTable(props: Prop) {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
         console.log("change page :" + page + ", size " + parseInt(event.target.value, 10));
-        props.getMasters(page, parseInt(event.target.value, 10), searchValue, orderBy, order);
+        props.getMasters(0, parseInt(event.target.value, 10), searchValue, orderBy, order);
     };
 
     const canCreateMaster = () => {

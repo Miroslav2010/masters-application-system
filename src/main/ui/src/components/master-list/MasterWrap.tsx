@@ -13,8 +13,6 @@ interface State {
     totalNumberMasters: number;
     loading: boolean;
     searchValue: string;
-    orderBy: string;
-    order: string;
 }
 
 class MasterWrap extends React.Component<Props, State> {
@@ -26,9 +24,7 @@ class MasterWrap extends React.Component<Props, State> {
             masters: [],
             loading: true,
             totalNumberMasters: 0,
-            searchValue: '',
-            orderBy: 'lastModified',
-            order: 'desc'
+            searchValue: ''
         }
     }
 
@@ -49,9 +45,7 @@ class MasterWrap extends React.Component<Props, State> {
                     masters: masters.masterPreviews,
                     totalNumberMasters: masters.mastersNumber,
                     loading: false,
-                    searchValue: filter,
-                    orderBy: orderBy,
-                    order: order
+                    searchValue: filter
                 })
             });
     }
@@ -60,8 +54,7 @@ class MasterWrap extends React.Component<Props, State> {
         return (
             <PageLayout>
                 <EnhancedTable masters={this.state.masters} loading={this.state.loading} getMasters={this.getMasters}
-                               mastersNumber={this.state.totalNumberMasters} search={ this.state.searchValue }
-                               orderBy={this.state.orderBy} order={this.state.order} />
+                               mastersNumber={this.state.totalNumberMasters} search={ this.state.searchValue } />
             </PageLayout>
         )
     }
